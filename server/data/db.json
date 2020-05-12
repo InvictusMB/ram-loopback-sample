@@ -1,7 +1,9 @@
 {
   "ids": {
     "Restaurant": 3,
-    "Review": 4
+    "Review": 4,
+    "User": 4,
+    "UserCredentials": 4
   },
   "models": {
     "Restaurant": {
@@ -12,6 +14,16 @@
       "1": "{\"rating\":5,\"comment\":\"Excellent\",\"date\":\"2020-05-11T14:38:09.449Z\",\"restaurantId\":1,\"id\":1}",
       "2": "{\"rating\":3,\"comment\":\"Good\",\"date\":\"2020-05-11T16:35:32.894Z\",\"restaurantId\":2,\"id\":2}",
       "3": "{\"rating\":2,\"comment\":\"So-so\",\"date\":\"2020-05-11T16:35:32.894Z\",\"restaurantId\":2,\"id\":3}"
+    },
+    "User": {
+      "1": "{\"name\":\"admin\",\"roles\":[\"admin\",\"user\"],\"id\":\"1\"}",
+      "2": "{\"name\":\"owner1\",\"roles\":[\"business\",\"user\"],\"id\":\"2\"}",
+      "3": "{\"name\":\"user1\",\"roles\":[\"user\"],\"id\":\"3\"}"
+    },
+    "UserCredentials": {
+      "1": "{\"password\":\"$2a$10$l6bWyTtLqk.n/Q5jzgbfl.3U51TWtgOXNId4df0PoRKUG3zGEy5Ya\",\"userId\":1,\"id\":\"1\"}",
+      "2": "{\"password\":\"$2a$10$FzuNzsjNnZM9LllF1uxYUelLl1VZZYJi0kr5iJnbmZ98.E4KD4psS\",\"userId\":2,\"id\":\"2\"}",
+      "3": "{\"password\":\"$2a$10$jZfmq/caxEGeiKZMjVcxyexyfJbdgpRDrmrNy0/9vwML8iQENj/v.\",\"userId\":3,\"id\":\"3\"}"
     }
   }
 }
