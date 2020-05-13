@@ -38,7 +38,7 @@ export class RestaurantReviewController {
     },
   })
   async find(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Review>,
   ): Promise<Review[]> {
     return this.restaurantRepository.reviews(id).find(filter);
@@ -77,7 +77,7 @@ export class RestaurantReviewController {
     },
   })
   async delete(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Review)) where?: Where<Review>,
   ): Promise<Count> {
     return this.restaurantRepository.reviews(id).delete(where);

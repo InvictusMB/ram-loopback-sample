@@ -1,3 +1,6 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -15,9 +18,13 @@ import {
   put,
   del,
   requestBody,
+  HttpErrors,
 } from '@loopback/rest';
+import {UserProfile, securityId, SecurityBindings} from '@loopback/security';
 import {Restaurant} from '../models';
 import {RestaurantRepository} from '../repositories';
+import {roleAuthorization} from '../services';
+import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 export class RestaurantController {
   constructor(
@@ -26,6 +33,7 @@ export class RestaurantController {
   ) {}
 
   @post('/restaurants', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Restaurant model instance',
@@ -33,7 +41,14 @@ export class RestaurantController {
       },
     },
   })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['business'],
+    voters: [roleAuthorization],
+  })
   async create(
+    @inject(SecurityBindings.USER)
+    currentUserProfile: UserProfile,
     @requestBody({
       content: {
         'application/json': {
@@ -46,6 +61,9 @@ export class RestaurantController {
     })
     restaurant: Omit<Restaurant, 'id'>,
   ): Promise<Restaurant> {
+    if (!currentUserProfile.roles.includes('admin') && restaurant.ownerId !== currentUserProfile[securityId]) {
+      throw new HttpErrors.Forbidden('ownerId does not match the current user');
+    }
     return this.restaurantRepository.create(restaurant);
   }
 
@@ -97,21 +115,27 @@ export class RestaurantController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(Restaurant, {exclude: 'where'}) filter?: FilterExcludingWhere<Restaurant>,
   ): Promise<Restaurant> {
     return this.restaurantRepository.findById(id, filter);
   }
 
   @patch('/restaurants/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'Restaurant PATCH success',
       },
     },
   })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -125,27 +149,40 @@ export class RestaurantController {
   }
 
   @put('/restaurants/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'Restaurant PUT success',
       },
     },
   })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() restaurant: Restaurant,
   ): Promise<void> {
     await this.restaurantRepository.replaceById(id, restaurant);
   }
 
   @del('/restaurants/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'Restaurant DELETE success',
       },
     },
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
+    await this.restaurantRepository.reviews(id).delete();
     await this.restaurantRepository.deleteById(id);
   }
 }

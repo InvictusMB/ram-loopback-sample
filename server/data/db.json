@@ -1,14 +1,15 @@
 {
   "ids": {
-    "Restaurant": 3,
+    "Restaurant": 4,
     "Review": 4,
-    "User": 4,
-    "UserCredentials": 4
+    "User": 5,
+    "UserCredentials": 5
   },
   "models": {
     "Restaurant": {
-      "1": "{\"name\":\"McD\",\"id\":1}",
-      "2": "{\"name\":\"KFB\",\"id\":2}"
+      "1": "{\"name\":\"McD\",\"ownerId\":\"2\",\"id\":\"1\"}",
+      "2": "{\"name\":\"KFB\",\"ownerId\":\"2\",\"id\":\"2\"}",
+      "3": "{\"name\":\"KebabKing\",\"ownerId\":\"4\",\"id\":\"3\"}"
     },
     "Review": {
       "1": "{\"rating\":5,\"comment\":\"Excellent\",\"date\":\"2020-05-11T14:38:09.449Z\",\"restaurantId\":1,\"id\":1}",
@@ -18,12 +19,14 @@
     "User": {
       "1": "{\"name\":\"admin\",\"roles\":[\"admin\",\"user\"],\"id\":\"1\"}",
       "2": "{\"name\":\"owner1\",\"roles\":[\"business\",\"user\"],\"id\":\"2\"}",
-      "3": "{\"name\":\"user1\",\"roles\":[\"user\"],\"id\":\"3\"}"
+      "3": "{\"name\":\"user1\",\"roles\":[\"user\"],\"id\":\"3\"}",
+      "4": "{\"name\":\"owner2\",\"roles\":[\"business\",\"user\"],\"id\":\"4\"}"
     },
     "UserCredentials": {
       "1": "{\"password\":\"$2a$10$l6bWyTtLqk.n/Q5jzgbfl.3U51TWtgOXNId4df0PoRKUG3zGEy5Ya\",\"userId\":1,\"id\":\"1\"}",
       "2": "{\"password\":\"$2a$10$FzuNzsjNnZM9LllF1uxYUelLl1VZZYJi0kr5iJnbmZ98.E4KD4psS\",\"userId\":2,\"id\":\"2\"}",
-      "3": "{\"password\":\"$2a$10$jZfmq/caxEGeiKZMjVcxyexyfJbdgpRDrmrNy0/9vwML8iQENj/v.\",\"userId\":3,\"id\":\"3\"}"
+      "3": "{\"password\":\"$2a$10$jZfmq/caxEGeiKZMjVcxyexyfJbdgpRDrmrNy0/9vwML8iQENj/v.\",\"userId\":3,\"id\":\"3\"}",
+      "4": "{\"password\":\"$2a$10$.W6niRjDzvJOyT3piMQDN.9JIa4M5TqToL68B9s.ppvYVRxwunju.\",\"userId\":4,\"id\":\"4\"}"
     }
   }
 }

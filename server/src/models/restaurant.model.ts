@@ -1,5 +1,6 @@
-import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository';
 import {Review} from './review.model';
+import {User} from './user.model';
 
 @model({
   settings: {
@@ -17,11 +18,11 @@ import {Review} from './review.model';
 })
 export class Restaurant extends Entity {
   @property({
-    type: 'number',
+    type: 'string',
     id: true,
     generated: true,
   })
-  id?: number;
+  id?: string;
 
   @property({
     type: 'string',
@@ -31,6 +32,9 @@ export class Restaurant extends Entity {
 
   @hasMany(() => Review)
   reviews: Review[];
+
+  @belongsTo(() => User)
+  ownerId: string;
 
   constructor(data?: Partial<Restaurant>) {
     super(data);

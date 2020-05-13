@@ -33,7 +33,7 @@ export class Review extends Entity {
   date: string;
 
   @belongsTo(() => Restaurant)
-  restaurantId: number;
+  restaurantId: string;
 
   constructor(data?: Partial<Review>) {
     super(data);
