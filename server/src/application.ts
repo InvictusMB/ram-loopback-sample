@@ -50,7 +50,7 @@ export class ServerApplication extends BootMixin(
 
     this.configure(AuthorizationBindings.COMPONENT).to({
       precedence: AuthorizationDecision.ALLOW,
-      defaultDecision: AuthorizationDecision.DENY,
+      defaultDecision: AuthorizationDecision.ALLOW,
     });
 
     // Bind authentication component related elements

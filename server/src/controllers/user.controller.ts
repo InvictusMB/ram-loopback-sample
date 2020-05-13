@@ -22,7 +22,11 @@ import {
 } from '@loopback/rest';
 import {User, LoginCredentials} from '../models';
 import {UserRepository} from '../repositories';
-import {PasswordHasher} from '../services/hash.password.bcryptjs';
+import {
+  roleAuthorization,
+  routeAuthorization,
+  PasswordHasher,
+} from '../services';
 
 import {
   TokenServiceBindings,
@@ -30,7 +34,6 @@ import {
   UserServiceBindings,
 } from '../keys';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
-import {basicAuthorization} from '../services/basic.authorizer';
 
 export class UserController {
   constructor(
@@ -125,7 +128,7 @@ export class UserController {
   @authenticate('jwt')
   @authorize({
     allowedRoles: ['user'],
-    voters: [basicAuthorization],
+    voters: [roleAuthorization, routeAuthorization],
   })
   async set(
     @inject(SecurityBindings.USER)
@@ -167,7 +170,7 @@ export class UserController {
   @authenticate('jwt')
   @authorize({
     allowedRoles: ['user'],
-    voters: [basicAuthorization],
+    voters: [roleAuthorization, routeAuthorization],
   })
   async findById(@param.path.string('userId') userId: string): Promise<User> {
     return this.userRepository.findById(userId);

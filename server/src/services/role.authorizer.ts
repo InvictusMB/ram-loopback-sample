@@ -6,7 +6,7 @@ import {
   AuthorizationDecision,
 } from '@loopback/authorization';
 
-export async function basicAuthorization(
+export async function roleAuthorization(
   authorizationCtx: AuthorizationContext,
   metadata: AuthorizationMetadata,
 ): Promise<AuthorizationDecision> {
@@ -19,7 +19,7 @@ export async function basicAuthorization(
 
   const allowedRoles = metadata.allowedRoles;
   if (!allowedRoles) {
-    return AuthorizationDecision.ALLOW;
+    return AuthorizationDecision.ABSTAIN;
   }
 
   const roleIsAllowed = roles.some(role => allowedRoles.includes(role));
@@ -27,10 +27,5 @@ export async function basicAuthorization(
     return AuthorizationDecision.DENY;
   }
 
-  // Allow access only to model owners
-  if (principal.id === authorizationCtx.invocationContext.args[0]) {
-    return AuthorizationDecision.ALLOW;
-  }
-
-  return AuthorizationDecision.DENY;
+  return AuthorizationDecision.ABSTAIN;
 }
