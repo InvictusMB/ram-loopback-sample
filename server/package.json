@@ -15,7 +15,7 @@
     "build:watch": "lb-tsc --watch",
     "lint": "npm run eslint",
     "lint:fix": "npm run eslint:fix",
-    "eslint": "lb-eslint --report-unused-disable-directives .",
+    "eslint": "lb-eslint --report-unused-disable-directives -f friendly .",
     "eslint:fix": "npm run eslint -- --fix",
     "pretest": "npm run clean && npm run build",
     "test": "lb-mocha --allow-console-logs \"dist/__tests__\"",
@@ -68,10 +68,12 @@
     "@typescript-eslint/parser": "^2.31.0",
     "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",
+    "eslint-formatter-friendly": "^7.0.0",
     "eslint-plugin-eslint-plugin": "^2.2.1",
     "eslint-plugin-mocha": "^6.3.0",
     "patch-package": "^6.2.2",
     "source-map-support": "^0.5.19",
+    "ts-node": "^8.10.1",
     "typescript": "~3.9.3"
   }
 }

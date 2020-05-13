@@ -1,6 +1,6 @@
 import {Client} from '@loopback/testlab';
-import {ServerApplication} from '../..';
-import {setupApplication} from './test-helper';
+import {ServerApplication} from '../../application';
+import {setupApplication} from '../helpers';
 
 describe('HomePage', () => {
   let app: ServerApplication;

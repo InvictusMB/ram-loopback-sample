@@ -19,6 +19,7 @@ import {
   JWTAuthenticationStrategy,
   JWTOptionalAuthenticationStrategy,
 } from './authentication-strategies';
+import {bootOptions} from './boot-options';
 import {
   PasswordHasherBindings,
   TokenServiceBindings,
@@ -33,10 +34,16 @@ import {
   MyUserService
 } from './services';
 
+const defaultOptions = {
+  disablePersistence: false,
+};
+
 export class ServerApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
-  constructor(options: ApplicationConfig = {}) {
+  options: ServerConfig;
+
+  constructor(options: ServerConfig = defaultOptions) {
     super(options);
 
     this.setUpBindings();
@@ -68,17 +75,18 @@ export class ServerApplication extends BootMixin(
 
     this.projectRoot = __dirname;
     // Customize @loopback/boot Booter Conventions here
-    this.bootOptions = {
-      controllers: {
-        // Customize ControllerBooter Conventions here
-        dirs: ['controllers'],
-        extensions: ['.controller.js'],
-        nested: true,
-      },
-    };
+    this.bootOptions = bootOptions;
   }
 
   setUpBindings(): void {
+    if (this.options.disablePersistence) {
+      this.bind('datasources.config.memory').to({
+        name: 'memory',
+        connector: 'memory',
+        localStorage: 'restaurant-reviews-db'
+      });
+    }
+
     this.bind(TokenServiceBindings.TOKEN_SECRET).to(
       TokenServiceConstants.TOKEN_SECRET_VALUE,
     );
@@ -97,4 +105,8 @@ export class ServerApplication extends BootMixin(
 
     this.bind('authorizationProviders.admin').to(adminAuthorization).tag(AuthorizationTags.AUTHORIZER);
   }
+}
+
+type ServerConfig = ApplicationConfig & {
+  disablePersistence?: boolean,
 }
