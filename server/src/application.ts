@@ -1,5 +1,10 @@
 import {AuthenticationComponent} from '@loopback/authentication';
-import {AuthorizationComponent} from '@loopback/authorization';
+import {
+  AuthorizationBindings,
+  AuthorizationComponent,
+  AuthorizationDecision,
+  AuthorizationTags,
+} from '@loopback/authorization';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig, createBindingFromClass} from '@loopback/core';
 import {
@@ -13,12 +18,20 @@ import path from 'path';
 import {
   JWTAuthenticationStrategy,
   JWTOptionalAuthenticationStrategy,
-} from './authentication-strategies/jwt-strategy';
-import {PasswordHasherBindings, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from './keys';
+} from './authentication-strategies';
+import {
+  PasswordHasherBindings,
+  TokenServiceBindings,
+  TokenServiceConstants,
+  UserServiceBindings,
+} from './keys';
 import {MySequence} from './sequence';
-import {BcryptHasher} from './services/hash.password.bcryptjs';
-import {JWTService} from './services/jwt-service';
-import {MyUserService} from './services/user-service';
+import {
+  adminAuthorization,
+  BcryptHasher,
+  JWTService,
+  MyUserService
+} from './services';
 
 export class ServerApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
@@ -27,6 +40,11 @@ export class ServerApplication extends BootMixin(
     super(options);
 
     this.setUpBindings();
+
+    this.configure(AuthorizationBindings.COMPONENT).to({
+      precedence: AuthorizationDecision.ALLOW,
+      defaultDecision: AuthorizationDecision.DENY,
+    });
 
     // Bind authentication component related elements
     this.component(AuthenticationComponent);
@@ -76,5 +94,7 @@ export class ServerApplication extends BootMixin(
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
 
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
+
+    this.bind('authorizationProviders.admin').to(adminAuthorization).tag(AuthorizationTags.AUTHORIZER);
   }
 }

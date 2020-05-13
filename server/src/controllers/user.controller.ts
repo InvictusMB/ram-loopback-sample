@@ -124,7 +124,7 @@ export class UserController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin', 'user'],
+    allowedRoles: ['user'],
     voters: [basicAuthorization],
   })
   async set(
@@ -166,7 +166,7 @@ export class UserController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin', 'user'],
+    allowedRoles: ['user'],
     voters: [basicAuthorization],
   })
   async findById(@param.path.string('userId') userId: string): Promise<User> {
