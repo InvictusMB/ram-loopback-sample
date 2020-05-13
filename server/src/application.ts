@@ -15,10 +15,7 @@ import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
-import {
-  JWTAuthenticationStrategy,
-  JWTOptionalAuthenticationStrategy,
-} from './authentication-strategies';
+import {JWTAuthenticationStrategy} from './authentication-strategies';
 import {bootOptions} from './boot-options';
 import {
   PasswordHasherBindings,
@@ -59,7 +56,6 @@ export class ServerApplication extends BootMixin(
 
     // authentication
     this.add(createBindingFromClass(JWTAuthenticationStrategy));
-    this.add(createBindingFromClass(JWTOptionalAuthenticationStrategy));
 
     // Set up the custom sequence
     this.sequence(MySequence);

@@ -61,7 +61,7 @@ export class UserController {
       },
     },
   })
-  @authenticate('jwt-optional')
+  @authenticate('jwt', {optional: true})
   async create(
     @inject(SecurityBindings.USER)
     currentUserProfile: UserProfile,

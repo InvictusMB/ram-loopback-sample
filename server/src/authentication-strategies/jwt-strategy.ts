@@ -2,10 +2,16 @@
 
 import {
   asAuthStrategy,
+  AuthenticationBindings,
+  AuthenticationMetadata,
   AuthenticationStrategy,
   TokenService,
 } from '@loopback/authentication';
-import {bind, inject} from '@loopback/context';
+import {
+  bind,
+  inject,
+  Getter,
+} from '@loopback/context';
 import {
   asSpecEnhancer,
   mergeSecuritySchemeToSpec,
@@ -24,9 +30,23 @@ export class JWTAuthenticationStrategy
   constructor(
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public tokenService: TokenService,
+    @inject.getter(AuthenticationBindings.METADATA)
+    readonly getMetaData: Getter<AuthenticationMetadata>,
   ) {}
 
   async authenticate(request: Request): Promise<UserProfile | never> {
+    if (!request.headers.authorization) {
+      const emptyProfile = {
+        [securityId]: '',
+        name: 'NotAuthenticated',
+        roles: [],
+      };
+      const metaData = await this.getMetaData();
+      if (metaData?.options?.optional) {
+        return emptyProfile;
+      }
+    }
+
     const token: string = this.extractCredentials(request);
     const userProfile: UserProfile = await this.tokenService.verifyToken(token);
     return userProfile;
@@ -62,23 +82,5 @@ export class JWTAuthenticationStrategy
       scheme: 'bearer',
       bearerFormat: 'JWT',
     });
-  }
-}
-
-@bind(asAuthStrategy, asSpecEnhancer)
-export class JWTOptionalAuthenticationStrategy extends JWTAuthenticationStrategy {
-  name = 'jwt-optional';
-
-  async authenticate(request: Request): Promise<UserProfile | never> {
-    const emptyProfile = {
-      [securityId]: '',
-      name: 'not logged in',
-      roles: [],
-    };
-    if (!request.headers.authorization) {
-      return emptyProfile;
-    }
-
-    return super.authenticate(request);
   }
 }
