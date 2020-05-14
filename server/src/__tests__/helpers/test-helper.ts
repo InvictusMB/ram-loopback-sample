@@ -16,6 +16,7 @@ export async function setupApplication(): Promise<AppWithClient> {
 
   const app = new ServerApplication({
     rest: restConfig,
+    disablePersistence: true,
   });
 
   await app.boot();

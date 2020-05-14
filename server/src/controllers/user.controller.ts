@@ -89,6 +89,17 @@ export class UserController {
     );
 
     try {
+      // FIXME: Enforced by DB, currently broken in memory DS
+      const [existing] = await this.userRepository.find({where: {name: newUserRequest.login}});
+      if (existing) {
+        const err = new Error() as Error & {code: number, errmsg: string};
+        Object.assign(err, {
+          code: 11000,
+          errmsg: 'index: name',
+        });
+        throw err;
+      }
+
       // create the new user
       const savedUser = await this.userRepository.create(
         toUser(newUserRequest),
@@ -142,7 +153,7 @@ export class UserController {
       user.roles = _.uniq(user.roles);
 
       // Only admin can assign roles
-      if (!currentUserProfile.roles.includes('admin')) {
+      if (!User.isAdmin(currentUserProfile)) {
         delete user.roles;
       }
       const updatedUser = await this.userRepository.updateById(userId, user);
