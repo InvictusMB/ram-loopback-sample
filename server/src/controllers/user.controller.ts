@@ -16,6 +16,7 @@ import {
   put,
   param,
   get,
+  del,
   requestBody,
   HttpErrors,
   getModelSchemaRef,
@@ -185,6 +186,23 @@ export class UserController {
   })
   async findById(@param.path.string('userId') userId: string): Promise<User> {
     return this.userRepository.findById(userId);
+  }
+
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
+  @del('/users/{id}', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '204': {
+        description: 'User DELETE success',
+      },
+    },
+  })
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
+    await this.userRepository.deleteById(id);
   }
 
   @get('/users/me', {
