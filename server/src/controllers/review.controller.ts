@@ -1,3 +1,5 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {
   Count,
   CountSchema,
@@ -7,7 +9,6 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
   param,
   get,
   getModelSchemaRef,
@@ -18,36 +19,14 @@ import {
 } from '@loopback/rest';
 import {Review} from '../models';
 import {ReviewRepository} from '../repositories';
+import {roleAuthorization} from '../services';
+import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 export class ReviewController {
   constructor(
     @repository(ReviewRepository)
     public reviewRepository : ReviewRepository,
   ) {}
-
-  @post('/reviews', {
-    responses: {
-      '200': {
-        description: 'Review model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Review)}},
-      },
-    },
-  })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Review, {
-            title: 'NewReview',
-            exclude: ['id'],
-          }),
-        },
-      },
-    })
-    review: Omit<Review, 'id'>,
-  ): Promise<Review> {
-    return this.reviewRepository.create(review);
-  }
 
   @get('/reviews/count', {
     responses: {
@@ -97,13 +76,19 @@ export class ReviewController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(Review, {exclude: 'where'}) filter?: FilterExcludingWhere<Review>
   ): Promise<Review> {
     return this.reviewRepository.findById(id, filter);
   }
 
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
   @patch('/reviews/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'Review PATCH success',
@@ -111,7 +96,7 @@ export class ReviewController {
     },
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -124,7 +109,13 @@ export class ReviewController {
     await this.reviewRepository.updateById(id, review);
   }
 
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
   @put('/reviews/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'Review PUT success',
@@ -132,20 +123,26 @@ export class ReviewController {
     },
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() review: Review,
   ): Promise<void> {
     await this.reviewRepository.replaceById(id, review);
   }
 
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
   @del('/reviews/{id}', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '204': {
         description: 'Review DELETE success',
       },
     },
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.reviewRepository.deleteById(id);
   }
 }

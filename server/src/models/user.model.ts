@@ -1,6 +1,7 @@
 // Based on loopback4-example-shopping
 
 import {Entity, hasOne, model, property} from '@loopback/repository';
+import {UserProfile} from '@loopback/security';
 import {UserCredentials} from './user-credentials.model';
 import {roleSchema, UserRole} from './user-role.model';
 
@@ -42,5 +43,9 @@ export class User extends Entity {
 
   constructor(data?: Partial<User>) {
     super(data);
+  }
+
+  static isAdmin(user: User | UserProfile) {
+    return user.roles.includes('admin');
   }
 }

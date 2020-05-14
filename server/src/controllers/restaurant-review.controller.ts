@@ -1,3 +1,6 @@
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -10,15 +13,20 @@ import {
   get,
   getModelSchemaRef,
   getWhereSchemaFor,
+  HttpErrors,
   param,
   post,
   requestBody,
 } from '@loopback/rest';
+import {UserProfile, securityId, SecurityBindings} from '@loopback/security';
 import {
   Restaurant,
   Review,
+  User,
 } from '../models';
 import {RestaurantRepository} from '../repositories';
+import {roleAuthorization} from '../services';
+import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 export class RestaurantReviewController {
   constructor(
@@ -44,7 +52,13 @@ export class RestaurantReviewController {
     return this.restaurantRepository.reviews(id).find(filter);
   }
 
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['user'],
+    voters: [roleAuthorization],
+  })
   @post('/restaurants/{id}/reviews', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Restaurant model instance',
@@ -53,6 +67,8 @@ export class RestaurantReviewController {
     },
   })
   async create(
+    @inject(SecurityBindings.USER)
+    currentUserProfile: UserProfile,
     @param.path.string('id') id: typeof Restaurant.prototype.id,
     @requestBody({
       content: {
@@ -65,10 +81,19 @@ export class RestaurantReviewController {
       },
     }) review: Omit<Review, 'id' | 'restaurantId'>,
   ): Promise<Review> {
+    if (!User.isAdmin(currentUserProfile) && review.authorId !== currentUserProfile[securityId]) {
+      throw new HttpErrors.BadRequest('authorId does not match the current user');
+    }
     return this.restaurantRepository.reviews(id).create(review);
   }
 
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
   @del('/restaurants/{id}/reviews', {
+    security: OPERATION_SECURITY_SPEC,
     responses: {
       '200': {
         description: 'Restaurant.Review DELETE success count',

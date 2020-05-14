@@ -12,9 +12,9 @@
       "3": "{\"name\":\"KebabKing\",\"ownerId\":\"4\",\"id\":\"3\"}"
     },
     "Review": {
-      "1": "{\"rating\":5,\"comment\":\"Excellent\",\"date\":\"2020-05-11T14:38:09.449Z\",\"restaurantId\":1,\"id\":1}",
-      "2": "{\"rating\":3,\"comment\":\"Good\",\"date\":\"2020-05-11T16:35:32.894Z\",\"restaurantId\":2,\"id\":2}",
-      "3": "{\"rating\":2,\"comment\":\"So-so\",\"date\":\"2020-05-11T16:35:32.894Z\",\"restaurantId\":2,\"id\":3}"
+      "1": "{\"rating\":5,\"comment\":\"Excellent\",\"date\":\"2020-05-11T14:38:09.449Z\",\"restaurantId\":\"1\",\"authorId\":\"3\",\"id\":\"1\"}",
+      "2": "{\"rating\":3,\"comment\":\"Good\",\"date\":\"2020-05-11T16:35:32.894Z\",\"restaurantId\":\"2\",\"authorId\":\"3\",\"id\":\"2\"}",
+      "3": "{\"rating\":2,\"comment\":\"So-so\",\"date\":\"2020-05-11T16:35:32.894Z\",\"restaurantId\":\"2\",\"authorId\":\"3\",\"id\":\"3\"}"
     },
     "User": {
       "1": "{\"name\":\"admin\",\"roles\":[\"admin\",\"user\"],\"id\":\"1\"}",
