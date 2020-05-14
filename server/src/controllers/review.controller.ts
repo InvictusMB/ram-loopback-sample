@@ -143,6 +143,7 @@ export class ReviewController {
     },
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
+    await this.reviewRepository.reviewResponses(id).delete();
     await this.reviewRepository.deleteById(id);
   }
 }

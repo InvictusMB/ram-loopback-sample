@@ -22,7 +22,7 @@ import {
 } from '@loopback/rest';
 import {UserProfile, securityId, SecurityBindings} from '@loopback/security';
 import {Restaurant} from '../models';
-import {RestaurantRepository} from '../repositories';
+import {RestaurantRepository, ReviewRepository} from '../repositories';
 import {roleAuthorization} from '../services';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
@@ -30,6 +30,8 @@ export class RestaurantController {
   constructor(
     @repository(RestaurantRepository)
     public restaurantRepository: RestaurantRepository,
+    @repository(ReviewRepository)
+    public reviewRepository: ReviewRepository,
   ) {}
 
   @post('/restaurants', {
@@ -182,6 +184,10 @@ export class RestaurantController {
     voters: [roleAuthorization],
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
+    const reviews = await this.restaurantRepository.reviews(id).find();
+    for (const review of reviews) {
+      await this.reviewRepository.reviewResponses(review.id).delete();
+    }
     await this.restaurantRepository.reviews(id).delete();
     await this.restaurantRepository.deleteById(id);
   }
