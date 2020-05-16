@@ -15,6 +15,11 @@ export class Review extends Entity {
   @property({
     type: 'number',
     required: true,
+    jsonSchema: {
+      type: 'integer',
+      minimum: 1,
+      maximum: 5,
+    }
   })
   rating: number;
 
