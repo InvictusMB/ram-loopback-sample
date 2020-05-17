@@ -3,18 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "awilix": "^4.2.6",
+    "hoist-non-react-statics": "^3.3.2",
+    "mobx": "^5.15.4",
+    "mobx-react": "^6.2.2",
+    "mobx-task": "^2.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
   },
   "scripts": {
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
+    "serve": "react-scripts start",
     "prestart": "npm run build:style",
-    "start": "react-scripts start",
+    "start": "npm-run-all -p serve watch-resolver",
     "prebuild": "npm run build:style",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "watch-resolver": "node ./scripts/watch-resolver"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -32,14 +39,18 @@
     ]
   },
   "devDependencies": {
+    "@ram-stack/composition-root": "^1.0.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "@types/jest": "^25.2.2",
+    "@types/mobx-task": "^2.0.1",
     "@types/node": "^14.0.1",
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "autoprefixer": "^9.8.0",
+    "chokidar": "^3.4.0",
+    "npm-run-all": "^4.1.5",
     "postcss-cli": "^7.1.1",
     "tailwindcss": "^1.4.6",
     "typescript": "^3.9.2"

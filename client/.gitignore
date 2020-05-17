@@ -1,6 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # generated
+/src/ram-context.d.ts
+/src/ram-context.js
 /src/styles/tailwind.css
 
 # dependencies

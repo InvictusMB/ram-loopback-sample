@@ -1,0 +1,137 @@
+{
+  "compositionRoots": {
+    "container": {
+      "template": "<%= root %>.register({<%= registrations %>});",
+      "plugins": [
+        ["template-emitter", {
+          "configPath": "tsContext",
+          "placeholders": ["top", "shell", "injected"],
+          "templateFilename": "./ram-context.d.ts.template",
+          "outputFilename": "./ram-context.d.ts"
+        }],
+        ["template-emitter", {
+          "configPath": "jsContext",
+          "placeholders": ["injected"],
+          "templateFilename": "./ram-context.js.template",
+          "outputFilename": "./ram-context.js"
+        }]
+      ]
+    }
+  },
+  "rules": {
+    "ClassInstances": {
+      "isAbstract": true,
+      "registrations.container": {
+        "naming.registration.casing": "camel",
+        "naming.identifier.casing": "pascal",
+        "decorators": [
+          "asClass"
+        ],
+        "modifiers": [
+          "singleton"
+        ],
+        "jsContext": {
+          "template.injected": "<%= registration %>: '<%= registration %>'"
+        },
+        "tsContext": {
+          "template.injected": "<%= registration %>: '<%= registration %>' as const",
+          "template.top": "<%= registration %>: import('./<%= filePath %>').<%= identifier %>"
+        }
+      }
+    },
+    "Classes": {
+      "isAbstract": true,
+      "registrations.container": {
+        "naming.registration.casing": "pascal",
+        "naming.identifier.casing": "pascal",
+        "decorators": [
+          "asValue"
+        ],
+        "jsContext": {
+          "template.injected": "<%= registration %>: '<%= registration %>'"
+        },
+        "tsContext": {
+          "template.injected": "<%= registration %>: '<%= registration %>' as const",
+          "template.top": "<%= registration %>: typeof import('./<%= filePath %>').<%= identifier %>"
+        }
+      }
+    },
+    "Components": {
+      "ext": ".component.tsx",
+      "registrations.container": {
+        "naming.registration.casing": "pascal",
+        "naming.identifier.casing": "pascal",
+        "decorators": [
+          "withContainer",
+          "asValue"
+        ],
+        "tsContext": {
+          "template.shell": "<%= registration %>: WrappedComponent<typeof import('./<%= filePath %>').<%= identifier %>>"
+        }
+      }
+    },
+    "Views": {
+      "inherit": "Components",
+      "ext": ".view.tsx",
+      "registrations.container": {
+        "naming.registration.suffix": "View",
+        "naming.identifier.suffix": "View",
+        "decorators": [
+          "withContainer",
+          "asValue"
+        ]
+      }
+    },
+    "Pages": {
+      "inherit": "Views",
+      "ext": ".page.tsx",
+      "registrations.container": {
+        "naming.registration.suffix": "Page",
+        "naming.identifier.suffix": "Page"
+      }
+    },
+    "StoreClasses": {
+      "inherit": "Classes",
+      "ext": ".store.ts",
+      "registrations.container": {
+        "naming.registration.suffix": "Store",
+        "naming.identifier.suffix": "Store"
+      }
+    },
+    "StoreInstances": {
+      "inherit": "ClassInstances",
+      "ext": ".store.ts",
+      "registrations.container": {
+        "naming.registration.suffix": "Store",
+        "naming.identifier.suffix": "Store"
+      }
+    },
+    "ServiceClasses": {
+      "inherit": "Classes",
+      "ext": ".service.ts",
+      "registrations.container": {
+        "naming.registration.suffix": "Service",
+        "naming.identifier.suffix": "Service"
+      }
+    },
+    "ServiceInstances": {
+      "inherit": "ClassInstances",
+      "ext": ".service.ts",
+      "registrations.container": {
+        "naming.registration.suffix": "Service",
+        "naming.identifier.suffix": "Service"
+      }
+    },
+    "Module": {
+      "compose": [
+        "Components",
+        "Views",
+        "Pages",
+        "StoreClasses",
+        "StoreInstances",
+        "ServiceClasses",
+        "ServiceInstances"
+      ]
+    }
+  }
+}
