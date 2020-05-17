@@ -29,7 +29,7 @@ import {
  * @export
  * @interface ReviewFilter
  */
-export interface ReviewFilter {
+export type ReviewFilter = {
     /**
      *
      * @type {number}

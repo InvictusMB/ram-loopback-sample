@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 
+import * as runtime from '../runtime';
 import { exists, mapValues } from '../runtime';
 import {
     RestaurantFields,
@@ -29,7 +30,7 @@ import {
  * @export
  * @interface RestaurantFilter1
  */
-export interface RestaurantFilter1 {
+export type RestaurantFilter1 = {
     /**
      *
      * @type {number}
@@ -59,7 +60,7 @@ export interface RestaurantFilter1 {
      * @type {{ [key: string]: object; }}
      * @memberof RestaurantFilter1
      */
-    where?: { [key: string]: object; };
+    where?: runtime.HTTPQuery;
     /**
      *
      * @type {RestaurantFields}
@@ -71,7 +72,7 @@ export interface RestaurantFilter1 {
      * @type {Array<RestaurantIncludeFilterItems>}
      * @memberof RestaurantFilter1
      */
-    include?: Array<RestaurantIncludeFilterItems>;
+    include?: RestaurantIncludeFilterItems[];
 }
 
 export function RestaurantFilter1FromJSON(json: any): RestaurantFilter1 {

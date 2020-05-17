@@ -29,19 +29,19 @@ import {
     ReviewWithRelationsToJSON,
 } from '../models';
 
-export interface RestaurantReviewControllerCreateRequest {
+export type RestaurantReviewControllerCreateRequest = {
     id: string;
     newReviewInRestaurant?: NewReviewInRestaurant;
 }
 
-export interface RestaurantReviewControllerDeleteRequest {
+export type RestaurantReviewControllerDeleteRequest = {
     id: string;
-    where?: { [key: string]: object; };
+    where?: runtime.HTTPQuery;
 }
 
-export interface RestaurantReviewControllerFindRequest {
+export type RestaurantReviewControllerFindRequest = {
     id: string;
-    filter?: { [key: string]: object; };
+    filter?: runtime.HTTPQuery;
 }
 
 /**

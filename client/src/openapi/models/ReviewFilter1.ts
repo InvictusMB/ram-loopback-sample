@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 
+import * as runtime from '../runtime';
 import { exists, mapValues } from '../runtime';
 import {
     ReviewFields,
@@ -29,7 +30,7 @@ import {
  * @export
  * @interface ReviewFilter1
  */
-export interface ReviewFilter1 {
+export type ReviewFilter1 = {
     /**
      *
      * @type {number}
@@ -59,7 +60,7 @@ export interface ReviewFilter1 {
      * @type {{ [key: string]: object; }}
      * @memberof ReviewFilter1
      */
-    where?: { [key: string]: object; };
+    where?: runtime.HTTPQuery;
     /**
      *
      * @type {ReviewFields}
@@ -71,7 +72,7 @@ export interface ReviewFilter1 {
      * @type {Array<ReviewIncludeFilterItems>}
      * @memberof ReviewFilter1
      */
-    include?: Array<ReviewIncludeFilterItems>;
+    include?: ReviewIncludeFilterItems[];
 }
 
 export function ReviewFilter1FromJSON(json: any): ReviewFilter1 {

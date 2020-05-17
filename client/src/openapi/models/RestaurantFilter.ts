@@ -29,7 +29,7 @@ import {
  * @export
  * @interface RestaurantFilter
  */
-export interface RestaurantFilter {
+export type RestaurantFilter = {
     /**
      *
      * @type {number}

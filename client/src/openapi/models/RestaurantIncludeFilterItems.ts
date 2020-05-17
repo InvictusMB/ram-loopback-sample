@@ -25,7 +25,7 @@ import {
  * @export
  * @interface RestaurantIncludeFilterItems
  */
-export interface RestaurantIncludeFilterItems {
+export type RestaurantIncludeFilterItems = {
     /**
      *
      * @type {string}

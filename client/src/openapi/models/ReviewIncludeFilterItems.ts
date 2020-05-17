@@ -25,7 +25,7 @@ import {
  * @export
  * @interface ReviewIncludeFilterItems
  */
-export interface ReviewIncludeFilterItems {
+export type ReviewIncludeFilterItems = {
     /**
      *
      * @type {string}

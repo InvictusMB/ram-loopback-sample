@@ -18,6 +18,7 @@ import {
     UserCredentialsWithRelationsFromJSON,
     UserCredentialsWithRelationsFromJSONTyped,
     UserCredentialsWithRelationsToJSON,
+    UserRolesEnum,
 } from './index';
 
 /**
@@ -43,7 +44,7 @@ export interface UserWithRelations {
      * @type {Array<string>}
      * @memberof UserWithRelations
      */
-    roles?: Array<UserWithRelationsRolesEnum>;
+    roles?: Array<UserRolesEnum>;
     /**
      *
      * @type {UserCredentialsWithRelations}
@@ -83,16 +84,6 @@ export function UserWithRelationsToJSON(value?: UserWithRelations | null): any {
         'roles': value.roles,
         'userCredentials': UserCredentialsWithRelationsToJSON(value.userCredentials),
     };
-}
-
-/**
-* @export
-* @enum {string}
-*/
-export enum UserWithRelationsRolesEnum {
-    User = 'user',
-    Business = 'business',
-    Admin = 'admin'
 }
 
 
