@@ -10,3 +10,11 @@ export function createContainer() {
     injectionMode: InjectionMode.PROXY,
   });
 }
+
+export {
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams,
+} from 'react-router-dom';

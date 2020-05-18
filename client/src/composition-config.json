@@ -16,6 +16,9 @@
           "outputFilename": "./ram-context.js"
         }]
       ]
+    },
+    "router": {
+      "template": "<%= root %>.register({<%= registrations %>});"
     }
   },
   "rules": {
@@ -86,6 +89,10 @@
       "inherit": "Views",
       "ext": ".page.tsx",
       "registrations.container": {
+        "naming.registration.suffix": "Page",
+        "naming.identifier.suffix": "Page"
+      },
+      "registrations.router": {
         "naming.registration.suffix": "Page",
         "naming.identifier.suffix": "Page"
       }

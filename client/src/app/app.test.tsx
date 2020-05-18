@@ -5,10 +5,19 @@ import '../ram-context';
 
 import {AppView} from './app.view';
 
-test('renders learn react link', () => {
-  const {getByText} = render(<AppView {...{
-    Shell: {} as Shell,
-  }} />);
-  const linkElement = getByText(/learn react/i);
+test('renders routes', () => {
+  const {getByText} = render(
+    <AppView {...{
+      Shell: {
+        foo: () => <div>foo</div>,
+      } as any,
+      router: {
+        routeConfig: {
+          '/foo': 'foo',
+        },
+      },
+    }} />,
+  );
+  const linkElement = getByText(/\/foo/i);
   expect(linkElement).toBeInTheDocument();
 });

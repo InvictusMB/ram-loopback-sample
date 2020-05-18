@@ -1,6 +1,7 @@
 declare const Injected = {
 <%= injected.map(v => '  ' + v ).join(',\n') %><%= injected.length ? ',' : '    // to be generated...' %>
   Shell: 'Shell' as const,
+  router: 'router' as const,
 }
 
 declare module '@ram-stack/context' {
@@ -17,9 +18,14 @@ declare module '@ram-stack/context' {
   export type InjectedDependencies = {
 <%= top.map(v => '    ' + v).join(',\n') %><%= top.length ? ',' : '    // to be generated...' %>
     Shell: Shell,
+    router: Router,
   };
 
   type Shell = {
 <%= shell.map(v => '    ' + v).join(',\n') %><%= shell.length ? ',' : '    // to be generated...' %>
   };
+
+  type Router = {
+    routeConfig: {[route: string]: string}
+  }
 }
