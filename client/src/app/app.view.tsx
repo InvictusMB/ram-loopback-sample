@@ -7,6 +7,7 @@ export const AppView = ({Shell, router}: PickInjected<typeof dependencies>) => {
   return (
     <div>
       <Router>
+        <Shell.LoginStatusView />
         {Object.keys(router.routeConfig).map(v => v.replace(':id', '1')).map((v) => (
           <div key={v}>
             <Link to={v}>{v}</Link>

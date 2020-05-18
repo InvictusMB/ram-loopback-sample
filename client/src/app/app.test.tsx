@@ -10,6 +10,7 @@ test('renders routes', () => {
     <AppView {...{
       Shell: {
         foo: () => <div>foo</div>,
+        LoginStatusView: () => null,
       } as any,
       router: {
         routeConfig: {
