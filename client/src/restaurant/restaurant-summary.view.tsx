@@ -28,6 +28,9 @@ export function RestaurantSummaryView({Shell, restaurant}: RestaurantSummaryView
         <MinIcon/>
         <div className="ml-2 font-bold">{minReview(restaurant)}</div>
       </div>
+      <Shell.RestaurantDeleteView {...{
+        restaurant,
+      }} />
     </div>
   );
 }

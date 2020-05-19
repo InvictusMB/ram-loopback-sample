@@ -1,5 +1,5 @@
 import {IReactionDisposer, reaction, qs} from '../core';
-import {Configuration, NewRestaurant, RestaurantControllerApi} from '../openapi';
+import {Configuration, NewRestaurant, Restaurant, RestaurantControllerApi} from '../openapi';
 
 export class RestaurantService {
   restApi: RestaurantControllerApi;
@@ -51,6 +51,17 @@ export class RestaurantService {
     try {
       return await this.restApi.restaurantControllerCreate({
         newRestaurant: restaurant,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
+
+  async deleteRestaurant(restaurant: Restaurant) {
+    try {
+      await this.restApi.restaurantControllerDeleteById({
+        id: restaurant.id!,
       });
     } catch (response) {
       const error = await this.apiService.parseResponseError(response);

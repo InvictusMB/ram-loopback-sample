@@ -14,6 +14,11 @@ export class RestaurantStore {
     return created;
   });
 
+  delete = task.resolved(async (restaurant: Restaurant) => {
+    await this.restaurantService.deleteRestaurant(restaurant);
+    await this.load();
+  });
+
   constructor({sessionStore, restaurantService}: RestaurantStoreDeps) {
     this.restaurantService = restaurantService;
     this.loginReaction = reaction(
