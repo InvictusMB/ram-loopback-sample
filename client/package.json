@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "awilix": "^4.2.6",
+    "date-fns": "^2.14.0",
     "hoist-non-react-statics": "^3.3.2",
     "lodash": "^4.17.15",
     "mobx": "^5.15.4",

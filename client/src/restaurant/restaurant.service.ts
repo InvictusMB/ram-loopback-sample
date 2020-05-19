@@ -1,8 +1,15 @@
-import {IReactionDisposer, reaction, qs} from '../core';
-import {Configuration, NewRestaurant, Restaurant, RestaurantControllerApi} from '../openapi';
+import {IReactionDisposer, qs, reaction} from '../core';
+import {
+  Configuration,
+  NewRestaurant,
+  Restaurant,
+  RestaurantControllerApi,
+  RestaurantReviewControllerApi,
+} from '../openapi';
 
 export class RestaurantService {
-  restApi: RestaurantControllerApi;
+  restaurantApi: RestaurantControllerApi;
+  reviewApi: RestaurantReviewControllerApi;
   apiService: RestaurantServiceDeps[typeof Injected.apiService];
   loginReaction: IReactionDisposer;
 
@@ -10,7 +17,10 @@ export class RestaurantService {
     const {sessionStore, apiService} = deps;
     this.apiService = apiService;
 
-    this.restApi = new RestaurantControllerApi(new Configuration({
+    this.restaurantApi = new RestaurantControllerApi(new Configuration({
+      queryParamsStringify: qs.stringify,
+    }));
+    this.reviewApi = new RestaurantReviewControllerApi(new Configuration({
       queryParamsStringify: qs.stringify,
     }));
 
@@ -18,12 +28,19 @@ export class RestaurantService {
       () => sessionStore.session,
       (session) => {
         if (session.isLoggedIn) {
-          this.restApi = new RestaurantControllerApi(new Configuration({
+          this.restaurantApi = new RestaurantControllerApi(new Configuration({
+            queryParamsStringify: qs.stringify,
+            accessToken: session.token,
+          }));
+          this.reviewApi = new RestaurantReviewControllerApi(new Configuration({
             queryParamsStringify: qs.stringify,
             accessToken: session.token,
           }));
         } else {
-          this.restApi = new RestaurantControllerApi(new Configuration({
+          this.restaurantApi = new RestaurantControllerApi(new Configuration({
+            queryParamsStringify: qs.stringify,
+          }));
+          this.reviewApi = new RestaurantReviewControllerApi(new Configuration({
             queryParamsStringify: qs.stringify,
           }));
         }
@@ -33,7 +50,7 @@ export class RestaurantService {
   }
 
   async getRestaurants() {
-    return this.restApi.restaurantControllerFind({
+    return this.restaurantApi.restaurantControllerFind({
       filter: {
         include: [{
           relation: 'owner',
@@ -47,9 +64,39 @@ export class RestaurantService {
     });
   }
 
+  async getRestaurantDetails(id: string) {
+    return this.restaurantApi.restaurantControllerFindById({
+      id,
+      filter: {
+        include: [{
+          relation: 'owner',
+          scope: {
+            fields: ['id', 'name'] as any,
+          },
+        }],
+      },
+    });
+  }
+
+  async getRestaurantReviews(id: string) {
+    return this.reviewApi.restaurantReviewControllerFind({
+      id,
+      filter: {
+        include: [{
+          relation: 'author',
+          scope: {
+            fields: ['id', 'name'] as any,
+          },
+        }, {
+          relation: 'reviewResponses',
+        }],
+      },
+    });
+  }
+
   async createRestaurant(restaurant: NewRestaurant) {
     try {
-      return await this.restApi.restaurantControllerCreate({
+      return await this.restaurantApi.restaurantControllerCreate({
         newRestaurant: restaurant,
       });
     } catch (response) {
@@ -60,7 +107,7 @@ export class RestaurantService {
 
   async deleteRestaurant(restaurant: Restaurant) {
     try {
-      await this.restApi.restaurantControllerDeleteById({
+      await this.restaurantApi.restaurantControllerDeleteById({
         id: restaurant.id!,
       });
     } catch (response) {

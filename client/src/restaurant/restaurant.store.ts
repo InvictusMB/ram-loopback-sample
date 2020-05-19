@@ -3,6 +3,7 @@ import {NewRestaurant, RestaurantWithRelations, UserWithRelations} from '../open
 
 export class RestaurantStore {
   @observable restaurants: Restaurant[] = [];
+  @observable restaurantDetails?: Restaurant;
 
   restaurantService: RestaurantService;
   loginReaction: IReactionDisposer;
@@ -17,6 +18,11 @@ export class RestaurantStore {
   delete = task.resolved(async (restaurant: Restaurant) => {
     await this.restaurantService.deleteRestaurant(restaurant);
     await this.load();
+  });
+
+  loadDetails = task.resolved(async (restaurantId: string) => {
+    this.restaurantDetails = await this.restaurantService.getRestaurantDetails(restaurantId);
+    this.restaurantDetails.reviews = await this.restaurantService.getRestaurantReviews(restaurantId);
   });
 
   constructor({sessionStore, restaurantService}: RestaurantStoreDeps) {
@@ -34,6 +40,7 @@ export class RestaurantStore {
     return (
       // @ts-ignore
       this.load.pending
+      || this.loadDetails.pending
     );
   }
 

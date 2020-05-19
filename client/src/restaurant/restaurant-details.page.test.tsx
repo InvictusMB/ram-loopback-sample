@@ -14,7 +14,17 @@ test('renders restaurant details', () => {
   const {getByText} = render(
     <MemoryRouter initialEntries={[route.replace(':id', id)]}>
       <Route path={route}>
-        <RestaurantDetailsPage />
+        <RestaurantDetailsPage {...{
+          Shell: {
+            RestaurantSummaryView: ({restaurant}: any) => <div>{restaurant.id}</div>,
+            ReviewListView: () => null,
+            Spinner: () => null,
+          } as any,
+          restaurantStore: {
+            restaurantDetails: {id},
+            loadDetails: async () => null,
+          } as any,
+        }} />
       </Route>
     </MemoryRouter>,
   );
