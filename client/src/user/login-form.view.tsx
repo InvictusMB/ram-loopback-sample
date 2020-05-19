@@ -11,7 +11,7 @@ export function LoginFormView({Shell, sessionStore}: PickInjected<typeof depende
     );
   }
 
-  const errors = extractMessages(sessionStore.login.error);
+  const errors = extractMessages(sessionStore.error);
 
   return (
     <form className="w-full">
@@ -46,6 +46,13 @@ export function LoginFormView({Shell, sessionStore}: PickInjected<typeof depende
           onClick={() => sessionStore.login({login, password})}
         >
           Sign In
+        </button>
+        <button
+          className="flex-shrink-0 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-teal-500 hover:text-white text-sm border-2 text-white py-1 px-2 m-1 rounded"
+          type="button"
+          onClick={() => sessionStore.createUser({login, password})}
+        >
+          Register
         </button>
       </div>
       {errors.map((e, i) => (

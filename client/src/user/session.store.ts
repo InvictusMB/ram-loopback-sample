@@ -23,6 +23,16 @@ export class SessionStore {
         token,
       };
       this.storedSession.set(this.session);
+      this.createUser.reset()
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  });
+  createUser = task.resolved(async (credentials: LoginCredentials) => {
+    try {
+      await this.userApi.userControllerCreate({newUser: credentials});
+      await this.login(credentials);
     } catch (response) {
       const error = await this.apiService.parseResponseError(response);
       return Promise.reject(error);
@@ -47,7 +57,7 @@ export class SessionStore {
   @computed get isFetching() {
     return (
       this.login.pending
-      || this.logout.pending
+      || this.createUser.pending
     );
   }
 
@@ -55,6 +65,10 @@ export class SessionStore {
     return (
       this.session.isLoggedIn
     );
+  }
+
+  @computed get error() {
+    return this.login.error || this.createUser.error;
   }
 }
 
