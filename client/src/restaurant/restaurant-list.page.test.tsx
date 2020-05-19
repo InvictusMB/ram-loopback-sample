@@ -13,7 +13,11 @@ test('renders restaurant list', () => {
   const {getByText} = render(
     <MemoryRouter initialEntries={[route]}>
       <Route path={route}>
-        <RestaurantListPage />
+        <RestaurantListPage {...{
+          Shell: {
+            RestaurantListView: () => null,
+          } as any,
+        }} />
       </Route>
     </MemoryRouter>,
   );

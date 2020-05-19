@@ -13,15 +13,11 @@ export function LoginStatusView({Shell, userProfileStore, sessionStore}: PickInj
     );
   }
 
-  const {id = '0', name} = userProfileStore.userProfile;
-  const gender = +id % 2 === 0 ? 'women' : 'men';
+  const {id, name} = userProfileStore.userProfile;
 
   return (
     <div className="w-full flex items-center">
-      <img
-        className="block h-8 rounded-full"
-        src={'https://randomuser.me/api/portraits/' + gender + '/' + id + '.jpg'} alt="Avatar"
-      />
+      <Shell.Avatar id={id} />
       <div className="w-full mx-3 mb-0 py-2">
         <label className="block text-gray-500 font-bold pr-4">
           {name}

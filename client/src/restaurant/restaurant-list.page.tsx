@@ -1,12 +1,15 @@
 import React from 'react';
 
-export function RestaurantListPage() {
+export function RestaurantListPage({Shell}: PickInjected<typeof dependencies>) {
   return (
-    <div>Restaurants</div>
+    <div>
+      <div>Restaurants</div>
+      <Shell.RestaurantListView />
+    </div>
   );
 }
 
-const dependencies = [] as const;
+const dependencies = [Injected.Shell] as const;
 Object.assign(RestaurantListPage, {
   route: '/restaurants',
   [Symbol.for('ram.deps')]: dependencies,
