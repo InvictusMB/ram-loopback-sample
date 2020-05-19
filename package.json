@@ -1,0 +1,19 @@
+{
+  "name": "root",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "npm --prefix client test && npm --prefix server test",
+    "postinstall": "npm-run-all -p install:client install:server",
+    "install:client": "cd client && npm install",
+    "install:server": "cd server && npm install",
+    "start": "npm-run-all -p start:server start:client",
+    "start:client": "wait-on http://localhost:3000/api/ && npm --prefix client start",
+    "start:server": "npm --prefix server start"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "wait-on": "^5.0.0"
+  }
+}
