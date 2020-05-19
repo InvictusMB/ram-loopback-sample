@@ -22,4 +22,5 @@ export {
   Link,
   useRouteMatch,
   useParams,
+  useHistory,
 } from 'react-router-dom';

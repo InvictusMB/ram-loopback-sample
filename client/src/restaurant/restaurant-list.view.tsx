@@ -4,6 +4,12 @@ import {Link} from '../core';
 export function RestaurantListView({Shell, restaurantStore}: RestaurantListViewProps) {
   const {restaurants} = restaurantStore;
 
+  if (restaurantStore.isFetching) {
+    return (
+      <Shell.Spinner />
+    );
+  }
+
   return (
     <div>
       {restaurants.map(restaurant => (
@@ -13,6 +19,7 @@ export function RestaurantListView({Shell, restaurantStore}: RestaurantListViewP
           }} />
         </Link>
       ))}
+      <Shell.RestaurantAddView />
     </div>
   );
 }

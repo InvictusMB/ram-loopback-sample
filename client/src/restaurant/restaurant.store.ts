@@ -1,10 +1,18 @@
 import {computed, IReactionDisposer, observable, reaction, task} from '../core';
+import {NewRestaurant, RestaurantWithRelations, UserWithRelations} from '../openapi';
 
 export class RestaurantStore {
   @observable restaurants: Restaurant[] = [];
 
   restaurantService: RestaurantService;
   loginReaction: IReactionDisposer;
+
+  create = task.resolved(async (owner: UserWithRelations, restaurant: NewRestaurant) => {
+    const created: RestaurantWithRelations = await this.restaurantService.createRestaurant(restaurant);
+    created.owner = owner;
+    this.restaurants.push(created);
+    return created;
+  });
 
   constructor({sessionStore, restaurantService}: RestaurantStoreDeps) {
     this.restaurantService = restaurantService;

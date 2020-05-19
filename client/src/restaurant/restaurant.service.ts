@@ -1,11 +1,15 @@
 import {IReactionDisposer, reaction, qs} from '../core';
-import {Configuration, RestaurantControllerApi} from '../openapi';
+import {Configuration, NewRestaurant, RestaurantControllerApi} from '../openapi';
 
 export class RestaurantService {
   restApi: RestaurantControllerApi;
+  apiService: RestaurantServiceDeps[typeof Injected.apiService];
   loginReaction: IReactionDisposer;
 
-  constructor({sessionStore}: RestaurantServiceDeps) {
+  constructor(deps: RestaurantServiceDeps) {
+    const {sessionStore, apiService} = deps;
+    this.apiService = apiService;
+
     this.restApi = new RestaurantControllerApi(new Configuration({
       queryParamsStringify: qs.stringify,
     }));
@@ -42,9 +46,21 @@ export class RestaurantService {
       },
     });
   }
+
+  async createRestaurant(restaurant: NewRestaurant) {
+    try {
+      return await this.restApi.restaurantControllerCreate({
+        newRestaurant: restaurant,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
 }
 
 const dependencies = [
+  Injected.apiService,
   Injected.sessionStore,
 ] as const;
 type RestaurantServiceDeps = PickInjected<typeof dependencies>;
