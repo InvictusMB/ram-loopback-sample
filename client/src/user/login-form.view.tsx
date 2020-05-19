@@ -40,20 +40,15 @@ export function LoginFormView({Shell, sessionStore}: PickInjected<typeof depende
             />
           </div>
         </div>
-        <button
-          className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-2 text-white py-1 px-2 m-1 rounded"
-          type="button"
-          onClick={() => sessionStore.login({login, password})}
-        >
-          Sign In
-        </button>
-        <button
-          className="flex-shrink-0 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-teal-500 hover:text-white text-sm border-2 text-white py-1 px-2 m-1 rounded"
-          type="button"
-          onClick={() => sessionStore.createUser({login, password})}
-        >
-          Register
-        </button>
+        <Shell.ButtonPrimary {...{
+          onClick: () => sessionStore.login({login, password}),
+          children: 'Sign In',
+        }} />
+        <Shell.ButtonSecondary {...{
+          className: 'mr-2',
+          onClick: () => sessionStore.createUser({login, password}),
+          children: 'Register',
+        }} />
       </div>
       {errors.map((e, i) => (
         <p className="text-red-500 text-xs italic px-3" key={i}>{e}</p>

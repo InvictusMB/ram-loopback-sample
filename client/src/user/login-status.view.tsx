@@ -27,12 +27,11 @@ export function LoginStatusView({Shell, userProfileStore, sessionStore}: PickInj
           {name}
         </label>
       </div>
-      <button
-        className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-2 text-white py-1 px-2 m-1 rounded"
-        type="button"
-        onClick={() => sessionStore.logout()}>
-        Sign out
-      </button>
+      <Shell.ButtonPrimary {...{
+        className: 'mr-2',
+        onClick: () => sessionStore.logout(),
+        children: 'Sign out',
+      }} />
     </div>
   );
 }
