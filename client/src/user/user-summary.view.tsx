@@ -45,6 +45,13 @@ export function UserSummaryView(props: UserSummaryViewProps) {
           }} />
         )}
       </div>
+      <Shell.RoleEdit {...{
+        value: user.roles,
+        onChange: async (roles: string[]) => {
+          user.roles = roles as UserRolesEnum[];
+          await userStore.update(user);
+        },
+      }} />
       <Shell.DeleteItem {...{
         error: userStore.delete.error,
         executeDelete: async () => {
