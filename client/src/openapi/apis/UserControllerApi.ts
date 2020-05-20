@@ -27,6 +27,9 @@ import {
     User,
     UserFromJSON,
     UserToJSON,
+    UserFilter,
+    UserFilterFromJSON,
+    UserFilterToJSON,
 } from '../models';
 
 export type UserControllerCreateRequest = {
@@ -35,6 +38,10 @@ export type UserControllerCreateRequest = {
 
 export type UserControllerDeleteByIdRequest = {
     id: string;
+}
+
+export type UserControllerFindRequest = {
+    filter?: UserFilter;
 }
 
 export type UserControllerFindByIdRequest = {
@@ -123,6 +130,42 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async userControllerDeleteById(requestParameters: UserControllerDeleteByIdRequest): Promise<void> {
         await this.userControllerDeleteByIdRaw(requestParameters);
+    }
+
+    /**
+     */
+    async userControllerFindRaw(requestParameters: UserControllerFindRequest): Promise<runtime.ApiResponse<Array<User>>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.filter !== undefined) {
+            queryParameters['filter'] = requestParameters.filter;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("jwt", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/users`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserFromJSON));
+    }
+
+    /**
+     */
+    async userControllerFind(requestParameters: UserControllerFindRequest): Promise<Array<User>> {
+        const response = await this.userControllerFindRaw(requestParameters);
+        return await response.value();
     }
 
     /**
@@ -222,7 +265,7 @@ export class UserControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async userControllerSetRaw(requestParameters: UserControllerSetRequest): Promise<runtime.ApiResponse<User>> {
+    async userControllerSetRaw(requestParameters: UserControllerSetRequest): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.userId === null || requestParameters.userId === undefined) {
             throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling userControllerSet.');
         }
@@ -249,12 +292,12 @@ export class UserControllerApi extends runtime.BaseAPI {
             body: UserToJSON(requestParameters.user),
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      */
-    async userControllerSet(requestParameters: UserControllerSetRequest): Promise<User> {
+    async userControllerSet(requestParameters: UserControllerSetRequest): Promise<void> {
         const response = await this.userControllerSetRaw(requestParameters);
         return await response.value();
     }

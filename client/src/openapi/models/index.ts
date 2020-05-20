@@ -28,4 +28,8 @@ export * from './ReviewScopeFilter';
 export * from './ReviewWithRelations';
 export * from './User';
 export * from './UserCredentialsWithRelations';
+export * from './UserFields';
+export * from './UserFilter';
+export * from './UserIncludeFilterItems';
+export * from './UserScopeFilter';
 export * from './UserWithRelations';

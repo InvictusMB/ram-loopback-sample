@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import {inject} from '@loopback/core';
-import {repository} from '@loopback/repository';
+import {Filter, repository} from '@loopback/repository';
 import {NewUserRequest, toUser} from '../models/new-user-request.model';
 import {
   authenticate,
@@ -46,6 +46,33 @@ export class UserController {
     @inject(UserServiceBindings.USER_SERVICE)
     public userService: UserService<User, LoginCredentials>,
   ) {}
+
+  @get('/users', {
+    security: OPERATION_SECURITY_SPEC,
+    responses: {
+      '200': {
+        description: 'Array of User model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(User),
+            },
+          },
+        },
+      },
+    },
+  })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [roleAuthorization],
+  })
+  async find(
+    @param.filter(User) filter?: Filter<User>,
+  ): Promise<User[]> {
+    return this.userRepository.find(filter);
+  }
 
   @post('/users', {
     security: OPERATION_SECURITY_SPEC,
@@ -125,15 +152,8 @@ export class UserController {
   @put('/users/{userId}', {
     security: OPERATION_SECURITY_SPEC,
     responses: {
-      '200': {
-        description: 'User',
-        content: {
-          'application/json': {
-            schema: {
-              'x-ts-type': User,
-            },
-          },
-        },
+      '204': {
+        description: 'User PUT success',
       },
     },
   })

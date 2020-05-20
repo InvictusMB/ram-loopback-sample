@@ -16,6 +16,11 @@ test('renders restaurant list', () => {
         <RestaurantListPage {...{
           Shell: {
             RestaurantListView: () => null,
+            RatingEdit: () => null,
+            ButtonCancel: () => null,
+          } as any,
+          userProfileStore: {
+            userProfile: {},
           } as any,
         }} />
       </Route>

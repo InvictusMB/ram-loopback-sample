@@ -13,7 +13,17 @@ test('renders user list', () => {
   const {getByText} = render(
     <MemoryRouter initialEntries={[route]}>
       <Route path={route}>
-        <UserListPage />
+        <UserListPage {...{
+          Shell: {
+          } as any,
+          userStore: {
+            users: [],
+            loadUsers: () => Promise.resolve(),
+          } as any,
+          userProfileStore: {
+
+          } as any
+        }} />
       </Route>
     </MemoryRouter>,
   );

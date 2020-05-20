@@ -11,17 +11,30 @@ export function RestaurantListPage({Shell, userProfileStore}: PickInjected<typeo
     UserRolesEnum.Business,
   ];
 
-  const isUserAllowed = isAllowed(dashboardRoles, userProfileStore.userProfile!);
+  const isOwner = isAllowed(dashboardRoles, userProfileStore.userProfile!);
+
+  const userListRoles = [
+    UserRolesEnum.Admin,
+  ];
+
+  const isAdmin = isAllowed(userListRoles, userProfileStore.userProfile!);
 
   return (
     <div>
       <div className="flex justify-between bg-teal-600 text-white">
         <div className="font-bold p-2 flex">
           <div>Restaurants</div>
-          {isUserAllowed && (
+          {isOwner && (
             <Link to="/dashboard">
               <div className="bg-white text-blue-400 underline rounded-full ml-4 px-4 whitespace-no-wrap">
                 My Dashboard
+              </div>
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/users">
+              <div className="bg-white text-blue-400 underline rounded-full ml-4 px-4 whitespace-no-wrap">
+                Users
               </div>
             </Link>
           )}
