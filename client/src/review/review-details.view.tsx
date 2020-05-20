@@ -1,11 +1,21 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {format} from 'date-fns';
 import sanitize from 'sanitize-html';
 
-import {RestaurantWithRelations, ReviewWithRelations} from '../openapi/models';
+import {RestaurantWithRelations, ReviewWithRelations, UserRolesEnum} from '../openapi/models';
+import {isAllowed} from '../utils';
 
-export function ReviewDetailsView({Shell, review, restaurant, restaurantStore}: ReviewDetailsViewProps) {
+export function ReviewDetailsView(props: ReviewDetailsViewProps) {
+  const {Shell, review, restaurant, restaurantStore, userProfileStore} = props;
   const response = (review.reviewResponses ?? [])[0];
+
+  const [editReview, setEditReview] = useState(false);
+  const [reviewComment, setReviewComment] = useState(review.comment);
+
+  const allowedRoles = [
+    UserRolesEnum.Admin,
+  ];
+  const isEditAllowed = isAllowed(allowedRoles, userProfileStore.userProfile);
 
   return (
     <div className="mb-4">
@@ -21,29 +31,64 @@ export function ReviewDetailsView({Shell, review, restaurant, restaurantStore}: 
           <div className="ml-2 font-bold">{format(new Date(review.date), 'yyyy-MM-dd')}</div>
         </div>
       </div>
-      <div className="flex">
-        <div className="flex flex-col">
-          <div className="px-4 my-2 flex-shrink-0 flex">
-            <div className="text-gray-500 font-bold mr-2">{review.author?.name}</div>
-            <div>wrote:</div>
-          </div>
-          <div className="flex">
-            <div
-              className="self-end whitespace-no-wrap ml-10 px-4 py-2 border-teal-500 rounded-lg bg-gray-200 italic"
-              dangerouslySetInnerHTML={{__html: sanitize(review.comment)}}
-            />
-            <div className="ml-4 mt-2">
-              <Shell.DeleteItem {...{
-                error: restaurantStore.deleteReview.error,
-                executeDelete: async () => {
-                  await restaurantStore.deleteReview(review);
-                },
-              }} />
+      {editReview && (
+        <div className="flex bg-gray-200">
+          <Shell.CommentEdit {...{
+            className: 'w-full',
+            value: reviewComment,
+            onChange: setReviewComment,
+          }} />
+          <Shell.ButtonAccept {...{
+            className: 'text-green-500 mx-2',
+            onClick: async () => {
+              review.comment = reviewComment;
+              await restaurantStore.updateReview(review);
+              setEditReview(false);
+            },
+          }} />
+          <Shell.ButtonCancel{...{
+            className: 'text-teal-500 mr-4',
+            onClick: () => {
+              setReviewComment(review.comment);
+              setEditReview(false);
+            },
+          }} />
+        </div>
+      )}
+      {!editReview && (
+        <div className="flex">
+          <div className="flex flex-col">
+            <div className="px-4 my-2 flex-shrink-0 flex">
+              <div className="text-gray-500 font-bold mr-2">{review.author?.name}</div>
+              <div>wrote:</div>
+            </div>
+            <div className="flex">
+              <div
+                className="self-end whitespace-no-wrap ml-10 px-4 py-2 border-teal-500 rounded-lg bg-gray-200 italic"
+                dangerouslySetInnerHTML={{__html: sanitize(review.comment)}}
+              />
+              {isEditAllowed && !editReview && (
+                <Shell.ButtonEdit {...{
+                  className: 'ml-2 text-gray-500',
+                  onClick: e => {
+                    e.preventDefault();
+                    setEditReview(true);
+                  },
+                }} />
+              )}
+              <div className="ml-4 mt-2">
+                <Shell.DeleteItem {...{
+                  error: restaurantStore.deleteReview.error,
+                  executeDelete: async () => {
+                    await restaurantStore.deleteReview(review);
+                  },
+                }} />
+              </div>
             </div>
           </div>
+          <div className="w-full" />
         </div>
-        <div className="w-full" />
-      </div>
+      )}
       {response && (
         <div className="flex">
           <div className="w-full" />
@@ -83,6 +128,7 @@ export function ReviewDetailsView({Shell, review, restaurant, restaurantStore}: 
 const dependencies = [
   Injected.Shell,
   Injected.restaurantStore,
+  Injected.userProfileStore,
 ] as const;
 Object.assign(ReviewDetailsView, {[Symbol.for('ram.deps')]: dependencies});
 

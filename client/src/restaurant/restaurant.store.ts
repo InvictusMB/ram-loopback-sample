@@ -58,6 +58,10 @@ export class RestaurantStore {
     this.restaurantDetails.reviews = fp.filter(r => r.id !== review.id, reviews);
   });
 
+  updateReview = task.resolved(async (review) => {
+    await this.restaurantService.updateReview(review);
+  });
+
   deleteReviewResponse = task.resolved(async (review: ReviewWithRelations, response: ReviewResponse) => {
     await this.restaurantService.deleteReviewResponse(response);
     review.reviewResponses = [];

@@ -221,6 +221,18 @@ export class RestaurantService {
     }
   }
 
+  async updateReview(review: Review) {
+    try {
+      await this.reviewApi.reviewControllerReplaceById({
+        id: review.id!,
+        review,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
+
   async createReviewResponse(review: Review, response: NewReviewResponseInReview) {
     try {
       return await this.reviewResponseApi.reviewResponseControllerCreate({
