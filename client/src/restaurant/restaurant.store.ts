@@ -1,9 +1,12 @@
+import fp from 'lodash/fp';
+
 import {computed, IReactionDisposer, observable, reaction, task} from '../core';
 import {NewRestaurant, RestaurantWithRelations, ReviewWithRelations, UserWithRelations} from '../openapi';
 
 export class RestaurantStore {
   @observable restaurants: Restaurant[] = [];
   @observable restaurantDetails?: Restaurant;
+  @observable pendingReviews: ReviewWithRelations[] = [];
 
   restaurantService: RestaurantService;
   loginReaction: IReactionDisposer;
@@ -48,6 +51,14 @@ export class RestaurantStore {
 
   loadByOwner = task.resolved(async (owner) => {
     this.restaurants = await this.restaurantService.getRestaurantsByOwner(owner);
+  });
+
+  loadPendingReviews = task.resolved(async (owner) => {
+    const reviews = await this.restaurantService.getPendingReviewsForOwner(owner);
+    this.pendingReviews = fp.map(r => {
+      r.restaurant = fp.find({id: r.restaurantId}, this.restaurants);
+      return r;
+    }, reviews);
   });
 
   constructor({sessionStore, restaurantService}: RestaurantStoreDeps) {

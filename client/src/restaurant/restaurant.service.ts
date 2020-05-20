@@ -1,3 +1,5 @@
+import fp from 'lodash/fp';
+
 import {IReactionDisposer, qs, reaction} from '../core';
 import {
   Configuration,
@@ -8,12 +10,16 @@ import {
   RestaurantControllerApi,
   RestaurantReviewControllerApi,
   Review,
-  ReviewResponseControllerApi, User,
+  ReviewControllerApi,
+  ReviewResponseControllerApi,
+  ReviewWithRelations,
+  User,
 } from '../openapi';
 
 export class RestaurantService {
   restaurantApi: RestaurantControllerApi;
-  reviewApi: RestaurantReviewControllerApi;
+  restaurantReviewApi: RestaurantReviewControllerApi;
+  reviewApi: ReviewControllerApi;
   reviewResponseApi: ReviewResponseControllerApi;
   apiService: RestaurantServiceDeps[typeof Injected.apiService];
   loginReaction: IReactionDisposer;
@@ -25,7 +31,10 @@ export class RestaurantService {
     this.restaurantApi = new RestaurantControllerApi(new Configuration({
       queryParamsStringify: qs.stringify,
     }));
-    this.reviewApi = new RestaurantReviewControllerApi(new Configuration({
+    this.restaurantReviewApi = new RestaurantReviewControllerApi(new Configuration({
+      queryParamsStringify: qs.stringify,
+    }));
+    this.reviewApi = new ReviewControllerApi(new Configuration({
       queryParamsStringify: qs.stringify,
     }));
     this.reviewResponseApi = new ReviewResponseControllerApi(new Configuration({
@@ -40,7 +49,11 @@ export class RestaurantService {
             queryParamsStringify: qs.stringify,
             accessToken: session.token,
           }));
-          this.reviewApi = new RestaurantReviewControllerApi(new Configuration({
+          this.restaurantReviewApi = new RestaurantReviewControllerApi(new Configuration({
+            queryParamsStringify: qs.stringify,
+            accessToken: session.token,
+          }));
+          this.reviewApi = new ReviewControllerApi(new Configuration({
             queryParamsStringify: qs.stringify,
             accessToken: session.token,
           }));
@@ -52,7 +65,10 @@ export class RestaurantService {
           this.restaurantApi = new RestaurantControllerApi(new Configuration({
             queryParamsStringify: qs.stringify,
           }));
-          this.reviewApi = new RestaurantReviewControllerApi(new Configuration({
+          this.restaurantReviewApi = new RestaurantReviewControllerApi(new Configuration({
+            queryParamsStringify: qs.stringify,
+          }));
+          this.reviewApi = new ReviewControllerApi(new Configuration({
             queryParamsStringify: qs.stringify,
           }));
           this.reviewResponseApi = new ReviewResponseControllerApi(new Configuration({
@@ -99,6 +115,24 @@ export class RestaurantService {
     });
   }
 
+  async getPendingReviewsForOwner(owner: User) {
+    const response = await this.reviewApi.reviewControllerFind({
+      filter: {
+        include: [{
+          relation: 'author',
+        }, {
+          relation: 'restaurant',
+        }, {
+          relation: 'reviewResponses',
+        }],
+      },
+    });
+    const filter = fp.filter<any>(r => (
+      r.restaurant.ownerId === owner.id && !r.reviewResponses
+    ));
+    return filter(response) as ReviewWithRelations[];
+  }
+
   async getRestaurantDetails(id: string) {
     return this.restaurantApi.restaurantControllerFindById({
       id,
@@ -114,7 +148,7 @@ export class RestaurantService {
   }
 
   async getRestaurantReviews(id: string) {
-    return this.reviewApi.restaurantReviewControllerFind({
+    return this.restaurantReviewApi.restaurantReviewControllerFind({
       id,
       filter: {
         include: [{
@@ -153,7 +187,7 @@ export class RestaurantService {
 
   async createReview(restaurant: Restaurant, review: NewReviewInRestaurant) {
     try {
-      return await this.reviewApi.restaurantReviewControllerCreate({
+      return await this.restaurantReviewApi.restaurantReviewControllerCreate({
         id: restaurant.id!,
         newReviewInRestaurant: review,
       });

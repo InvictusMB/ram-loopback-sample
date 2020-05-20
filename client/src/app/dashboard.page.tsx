@@ -14,6 +14,7 @@ export function DashboardPage(props: PickInjected<typeof dependencies>) {
   useEffect(() => {
     if (!userProfileStore.isFetching && isUserAllowed) {
       restaurantStore.loadByOwner(userProfileStore.userProfile).catch();
+      restaurantStore.loadPendingReviews(userProfileStore.userProfile).catch();
     }
     return () => {
       restaurantStore.load().catch();
@@ -32,7 +33,6 @@ export function DashboardPage(props: PickInjected<typeof dependencies>) {
     );
   }
 
-
   return (
     <div>
       <div className="flex font-bold p-2 bg-teal-600 ">
@@ -44,6 +44,17 @@ export function DashboardPage(props: PickInjected<typeof dependencies>) {
         </Link>
       </div>
       <Shell.RestaurantListView />
+      <div className="flex text-white font-bold p-2 bg-teal-600 mt-4 justify-between">
+        <div className="whitespace-no-wrap">
+          Awaiting response
+        </div>
+        <Shell.ButtonRefresh {...{
+          onClick: () => {
+            restaurantStore.loadPendingReviews(userProfileStore.userProfile).catch();
+          },
+        }} />
+      </div>
+      <Shell.PendingResponseListView />
     </div>
   );
 }
