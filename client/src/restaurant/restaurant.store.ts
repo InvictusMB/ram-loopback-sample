@@ -36,6 +36,12 @@ export class RestaurantStore {
     return created;
   });
 
+  createReviewResponse = task.resolved(async (review, response) => {
+    const created = await this.restaurantService.createReviewResponse(review, response);
+    review.reviewResponses = [created];
+    return created;
+  });
+
   constructor({sessionStore, restaurantService}: RestaurantStoreDeps) {
     this.restaurantService = restaurantService;
     this.loginReaction = reaction(

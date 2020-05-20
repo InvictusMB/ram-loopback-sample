@@ -3,14 +3,18 @@ import {
   Configuration,
   NewRestaurant,
   NewReviewInRestaurant,
+  NewReviewResponseInReview,
   Restaurant,
   RestaurantControllerApi,
   RestaurantReviewControllerApi,
+  Review,
+  ReviewResponseControllerApi,
 } from '../openapi';
 
 export class RestaurantService {
   restaurantApi: RestaurantControllerApi;
   reviewApi: RestaurantReviewControllerApi;
+  reviewResponseApi: ReviewResponseControllerApi;
   apiService: RestaurantServiceDeps[typeof Injected.apiService];
   loginReaction: IReactionDisposer;
 
@@ -22,6 +26,9 @@ export class RestaurantService {
       queryParamsStringify: qs.stringify,
     }));
     this.reviewApi = new RestaurantReviewControllerApi(new Configuration({
+      queryParamsStringify: qs.stringify,
+    }));
+    this.reviewResponseApi = new ReviewResponseControllerApi(new Configuration({
       queryParamsStringify: qs.stringify,
     }));
 
@@ -37,11 +44,18 @@ export class RestaurantService {
             queryParamsStringify: qs.stringify,
             accessToken: session.token,
           }));
+          this.reviewResponseApi = new ReviewResponseControllerApi(new Configuration({
+            queryParamsStringify: qs.stringify,
+            accessToken: session.token,
+          }));
         } else {
           this.restaurantApi = new RestaurantControllerApi(new Configuration({
             queryParamsStringify: qs.stringify,
           }));
           this.reviewApi = new RestaurantReviewControllerApi(new Configuration({
+            queryParamsStringify: qs.stringify,
+          }));
+          this.reviewResponseApi = new ReviewResponseControllerApi(new Configuration({
             queryParamsStringify: qs.stringify,
           }));
         }
@@ -122,6 +136,18 @@ export class RestaurantService {
       return await this.reviewApi.restaurantReviewControllerCreate({
         id: restaurant.id!,
         newReviewInRestaurant: review,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
+
+  async createReviewResponse(review: Review, response: NewReviewResponseInReview) {
+    try {
+      return await this.reviewResponseApi.reviewResponseControllerCreate({
+        id: review.id!,
+        newReviewResponseInReview: response,
       });
     } catch (response) {
       const error = await this.apiService.parseResponseError(response);

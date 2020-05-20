@@ -45,12 +45,16 @@ export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsView
               <span className="text-gray-500 font-bold mr-2">{restaurant.owner?.name}</span>replied:
             </div>
             <div
-              className="self-end mx-4 flex-grow-0 px-4 py-2 border-teal-500 rounded-lg bg-green-200 italic">
-              {response.comment}
-            </div>
+              className="self-end mx-4 flex-grow-0 px-4 py-2 border-teal-500 rounded-lg bg-green-200 italic"
+              dangerouslySetInnerHTML={{__html: sanitize(response.comment)}}
+            />
           </div>
         </div>
       )}
+      <Shell.ReviewResponseAddView {...{
+        restaurant,
+        review,
+      }} />
     </div>
   );
 }
