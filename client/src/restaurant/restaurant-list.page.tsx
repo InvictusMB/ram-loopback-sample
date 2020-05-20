@@ -1,15 +1,53 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-export function RestaurantListPage({Shell}: PickInjected<typeof dependencies>) {
+import {Link} from '../core';
+import {UserRolesEnum} from '../openapi/models';
+import {isAllowed} from '../utils';
+
+export function RestaurantListPage({Shell, userProfileStore}: PickInjected<typeof dependencies>) {
+  const [rating, setRating] = useState(0);
+
+  const dashboardRoles = [
+    UserRolesEnum.Business,
+  ];
+
+  const isUserAllowed = isAllowed(dashboardRoles, userProfileStore.userProfile!);
+
   return (
     <div>
-      <div>Restaurants</div>
-      <Shell.RestaurantListView />
+      <div className="flex justify-between bg-teal-600 text-white">
+        <div className="font-bold p-2 flex">
+          <div>Restaurants</div>
+          {isUserAllowed && (
+            <Link to="/dashboard">
+              <div className="bg-white text-blue-400 underline rounded-full ml-4 px-4 whitespace-no-wrap">
+                My Dashboard
+              </div>
+            </Link>
+          )}
+        </div>
+        <div className="px-2 self-center flex">
+          <Shell.RatingEdit {...{
+            value: rating,
+            onChange: setRating,
+          }} />
+          <Shell.ButtonCancel {...{
+            className: 'mx-2 text-white mt-1',
+            onClick: () => setRating(0),
+          }} />
+        </div>
+      </div>
+      <Shell.RestaurantListView {...{
+        filter: (r: any) => r.rating >= rating,
+      }} />
     </div>
   );
 }
 
-const dependencies = [Injected.Shell] as const;
+const dependencies = [
+  Injected.Shell,
+  Injected.userProfileStore,
+] as const;
 Object.assign(RestaurantListPage, {
   route: '/restaurants',
   [Symbol.for('ram.deps')]: dependencies,

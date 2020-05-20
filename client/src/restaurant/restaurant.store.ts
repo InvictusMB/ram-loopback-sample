@@ -42,6 +42,14 @@ export class RestaurantStore {
     return created;
   });
 
+  load = task.resolved(async () => {
+    this.restaurants = await this.restaurantService.getRestaurants();
+  });
+
+  loadByOwner = task.resolved(async (owner) => {
+    this.restaurants = await this.restaurantService.getRestaurantsByOwner(owner);
+  });
+
   constructor({sessionStore, restaurantService}: RestaurantStoreDeps) {
     this.restaurantService = restaurantService;
     this.loginReaction = reaction(
@@ -59,11 +67,6 @@ export class RestaurantStore {
       this.load.pending
       || this.loadDetails.pending
     );
-  }
-
-  @task.resolved
-  async load() {
-    this.restaurants = await this.restaurantService.getRestaurants();
   }
 
   reset() {

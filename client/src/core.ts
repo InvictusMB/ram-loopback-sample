@@ -20,6 +20,7 @@ export {
   Switch,
   Route,
   Link,
+  Redirect,
   useRouteMatch,
   useParams,
   useHistory,

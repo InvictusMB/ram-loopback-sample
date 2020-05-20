@@ -1,18 +1,13 @@
 import React from 'react';
 import {BrowserRouter as Router} from 'react-router-dom';
 
-import {Link, Route, Switch} from '../core';
+import {Route, Switch} from '../core';
 
 export const AppView = ({Shell, router}: PickInjected<typeof dependencies>) => {
   return (
     <div>
       <Router>
         <Shell.LoginStatusView />
-        {Object.keys(router.routeConfig).map(v => v.replace(':id', '1')).map((v) => (
-          <div key={v}>
-            <Link to={v}>{v}</Link>
-          </div>
-        ))}
         <Switch>
           {Object.entries(router.routeConfig)
             .map(([path, id]) => {
@@ -22,6 +17,7 @@ export const AppView = ({Shell, router}: PickInjected<typeof dependencies>) => {
               <Route {...{
                 key: path as string,
                 path: path as string,
+                exact: true,
                 render: (props: any) => <Component {...props} />,
               }} />
             ))}

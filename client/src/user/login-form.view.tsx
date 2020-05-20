@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
+import {useHistory} from '../core';
 import {extractMessages} from '../utils';
 
 export function LoginFormView({Shell, sessionStore}: PickInjected<typeof dependencies>) {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const history = useHistory();
 
   if (sessionStore.isFetching) {
     return (
@@ -41,7 +43,10 @@ export function LoginFormView({Shell, sessionStore}: PickInjected<typeof depende
           </div>
         </div>
         <Shell.ButtonPrimary {...{
-          onClick: () => sessionStore.login({login, password}),
+          onClick: async () => {
+            await sessionStore.login({login, password});
+            history.push('/');
+          },
           children: 'Sign In',
         }} />
         <Shell.ButtonSecondary {...{

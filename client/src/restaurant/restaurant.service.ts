@@ -8,7 +8,7 @@ import {
   RestaurantControllerApi,
   RestaurantReviewControllerApi,
   Review,
-  ReviewResponseControllerApi,
+  ReviewResponseControllerApi, User,
 } from '../openapi';
 
 export class RestaurantService {
@@ -75,6 +75,26 @@ export class RestaurantService {
         }, {
           relation: 'reviews',
         }],
+      },
+    });
+  }
+
+  async getRestaurantsByOwner(owner: User) {
+    return this.restaurantApi.restaurantControllerFind({
+      filter: {
+        include: [{
+          relation: 'owner',
+          scope: {
+            fields: ['id', 'name'] as any,
+          },
+        }, {
+          relation: 'reviews',
+        }],
+        where: {
+          ownerId: {
+            eq: owner.id,
+          },
+        },
       },
     });
   }

@@ -5,7 +5,6 @@ import {Restaurant, UserRolesEnum} from '../openapi';
 import {isAllowed} from '../utils';
 
 import {ReactComponent as DeleteSvg} from './circle-with-cross.svg';
-import {ReactComponent as CancelSvg} from './ccw.svg';
 import {ReactComponent as ConfirmSvg} from './check.svg';
 
 enum DeleteState {
@@ -44,15 +43,12 @@ export function RestaurantDeleteView(props: RestaurantDeleteViewProps) {
     return (
       <div className="w-1/6 flex justify-evenly flex-row">
         <p className="text-red-500 italic flex-shrink-0">{'Error!'}</p>
-        <button
-          className="transition duration-100 ease-in-out transform hover:scale-150"
-          onClick={e => {
+        <Shell.ButtonCancel {...{
+          onClick: (e: React.MouseEvent) => {
             prevent(e);
             setState(DeleteState.Initial);
-          }}
-        >
-          <CancelIcon />
-        </button>
+          },
+        }} />
       </div>
     );
   }
@@ -81,17 +77,17 @@ export function RestaurantDeleteView(props: RestaurantDeleteViewProps) {
             prevent(e);
             setState(DeleteState.InProgress);
             await restaurantStore.delete(restaurant).catch();
-            history.push(`/restaurants`)
+            history.push(`/restaurants`);
           }}
         >
           <ConfirmIcon />
         </button>
-        <button
-          className="transition duration-100 ease-in-out transform hover:scale-150"
-          onClick={() => setState(DeleteState.Initial)}
-        >
-          <CancelIcon />
-        </button>
+        <Shell.ButtonCancel {...{
+          onClick: (e: React.MouseEvent) => {
+            prevent(e);
+            setState(DeleteState.Initial);
+          },
+        }} />
       </div>
 
     );
@@ -111,14 +107,6 @@ function ConfirmIcon() {
   return (
     <div className="inline-block h-4 w-4 text-green-500">
       <ConfirmSvg stroke="currentColor" />
-    </div>
-  );
-}
-
-function CancelIcon() {
-  return (
-    <div className="inline-block h-4 w-4 text-black">
-      <CancelSvg stroke="currentColor" />
     </div>
   );
 }
