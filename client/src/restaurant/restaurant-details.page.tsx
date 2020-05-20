@@ -26,6 +26,9 @@ export function RestaurantDetailsPage(props: PickInjected<typeof dependencies>) 
       <Shell.ReviewListView {...{
         restaurant,
       }} />
+      <Shell.ReviewAddView {...{
+        restaurant,
+      }} />
     </div>
   );
 }

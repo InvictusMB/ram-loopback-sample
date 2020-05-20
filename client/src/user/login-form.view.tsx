@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import React, {useState} from 'react';
+import {extractMessages} from '../utils';
 
 export function LoginFormView({Shell, sessionStore}: PickInjected<typeof dependencies>) {
   const [login, setLogin] = useState('');
@@ -11,7 +11,7 @@ export function LoginFormView({Shell, sessionStore}: PickInjected<typeof depende
     );
   }
 
-  const errors = extractMessages(sessionStore.error);
+  const errors = extractMessages(sessionStore.error, 'Login failed');
 
   return (
     <form className="w-full">
@@ -55,22 +55,6 @@ export function LoginFormView({Shell, sessionStore}: PickInjected<typeof depende
       ))}
     </form>
   );
-}
-
-function extractMessages(e: any): string[] {
-  if (!e) {
-    return [];
-  }
-  if (e.details) {
-    return (e.details ?? []).map((d: any) => {
-      const path = _.capitalize(_.trimStart((d?.path ?? '').replace('/', ' ')));
-      return `${path} ${d?.message}`;
-    });
-  }
-  if (e.message) {
-    return [e.message];
-  }
-  return ['Login failed'];
 }
 
 const dependencies = [Injected.Shell, Injected.sessionStore] as const;

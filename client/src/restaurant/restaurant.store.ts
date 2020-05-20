@@ -1,5 +1,5 @@
 import {computed, IReactionDisposer, observable, reaction, task} from '../core';
-import {NewRestaurant, RestaurantWithRelations, UserWithRelations} from '../openapi';
+import {NewRestaurant, RestaurantWithRelations, ReviewWithRelations, UserWithRelations} from '../openapi';
 
 export class RestaurantStore {
   @observable restaurants: Restaurant[] = [];
@@ -23,6 +23,17 @@ export class RestaurantStore {
   loadDetails = task.resolved(async (restaurantId: string) => {
     this.restaurantDetails = await this.restaurantService.getRestaurantDetails(restaurantId);
     this.restaurantDetails.reviews = await this.restaurantService.getRestaurantReviews(restaurantId);
+  });
+
+  createReview = task.resolved(async (author, restaurant, review) => {
+    const created: ReviewWithRelations = await this.restaurantService.createReview(restaurant, review);
+    const current = this.restaurantDetails;
+    created.author = author;
+    if (current && current.id === restaurant.id) {
+      current.reviews = current.reviews || [];
+      current.reviews.push(created);
+    }
+    return created;
   });
 
   constructor({sessionStore, restaurantService}: RestaurantStoreDeps) {

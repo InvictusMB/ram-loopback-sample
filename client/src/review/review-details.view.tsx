@@ -1,5 +1,6 @@
 import React from 'react';
 import {format} from 'date-fns';
+import sanitize from 'sanitize-html';
 
 import {RestaurantWithRelations, ReviewWithRelations} from '../openapi/models';
 
@@ -27,9 +28,9 @@ export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsView
             <div>wrote:</div>
           </div>
           <div
-            className="self-end ml-10 px-4 py-2 border-teal-500 rounded-lg bg-gray-200 italic">
-            {review.comment}
-          </div>
+            className="self-end ml-10 px-4 py-2 border-teal-500 rounded-lg bg-gray-200 italic"
+            dangerouslySetInnerHTML={{__html: sanitize(review.comment)}}
+          />
         </div>
         <div className="w-full" />
       </div>

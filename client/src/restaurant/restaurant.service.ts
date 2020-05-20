@@ -2,6 +2,7 @@ import {IReactionDisposer, qs, reaction} from '../core';
 import {
   Configuration,
   NewRestaurant,
+  NewReviewInRestaurant,
   Restaurant,
   RestaurantControllerApi,
   RestaurantReviewControllerApi,
@@ -109,6 +110,18 @@ export class RestaurantService {
     try {
       await this.restaurantApi.restaurantControllerDeleteById({
         id: restaurant.id!,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
+
+  async createReview(restaurant: Restaurant, review: NewReviewInRestaurant) {
+    try {
+      return await this.reviewApi.restaurantReviewControllerCreate({
+        id: restaurant.id!,
+        newReviewInRestaurant: review,
       });
     } catch (response) {
       const error = await this.apiService.parseResponseError(response);
