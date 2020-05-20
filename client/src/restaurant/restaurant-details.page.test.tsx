@@ -17,7 +17,10 @@ test('renders restaurant details', () => {
         <RestaurantDetailsPage {...{
           Shell: {
             RestaurantSummaryView: ({restaurant}: any) => <div>{restaurant.id}</div>,
+            ReviewAddView: () => null,
+            ReviewDetailsView: () => null,
             ReviewListView: () => null,
+            ButtonRefresh: () => null,
             Spinner: () => null,
           } as any,
           restaurantStore: {

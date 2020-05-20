@@ -18,10 +18,12 @@ test('renders user list', () => {
           } as any,
           userStore: {
             users: [],
-            loadUsers: () => Promise.resolve(),
+            load: () => Promise.resolve(),
           } as any,
           userProfileStore: {
-
+            userProfile: {
+              roles: ['admin']
+            }
           } as any
         }} />
       </Route>

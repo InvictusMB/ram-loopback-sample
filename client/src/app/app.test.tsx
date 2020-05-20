@@ -14,11 +14,11 @@ test('renders routes', () => {
       } as any,
       router: {
         routeConfig: {
-          '/foo': 'foo',
+          '/': 'foo',
         },
       },
     }} />,
   );
-  const linkElement = getByText(/\/foo/i);
+  const linkElement = getByText('foo');
   expect(linkElement).toBeInTheDocument();
 });
