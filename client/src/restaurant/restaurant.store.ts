@@ -73,6 +73,10 @@ export class RestaurantStore {
     return created;
   });
 
+  updateReviewResponse = task.resolved(async (review, response) => {
+    await this.restaurantService.updateReviewResponse(review, response);
+  });
+
   load = task.resolved(async () => {
     this.restaurants = await this.restaurantService.getRestaurants();
   });

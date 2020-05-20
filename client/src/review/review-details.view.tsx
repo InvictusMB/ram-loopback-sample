@@ -12,6 +12,9 @@ export function ReviewDetailsView(props: ReviewDetailsViewProps) {
   const [editReview, setEditReview] = useState(false);
   const [reviewComment, setReviewComment] = useState(review.comment);
 
+  const [editResponse, setEditResponse] = useState(false);
+  const [reviewResponse, setReviewResponse] = useState(response?.comment);
+
   const allowedRoles = [
     UserRolesEnum.Admin,
   ];
@@ -69,7 +72,7 @@ export function ReviewDetailsView(props: ReviewDetailsViewProps) {
               />
               {isEditAllowed && !editReview && (
                 <Shell.ButtonEdit {...{
-                  className: 'ml-2 text-gray-500',
+                  className: 'ml-2 text-gray-500 self-start mt-2',
                   onClick: e => {
                     e.preventDefault();
                     setEditReview(true);
@@ -89,7 +92,7 @@ export function ReviewDetailsView(props: ReviewDetailsViewProps) {
           <div className="w-full" />
         </div>
       )}
-      {response && (
+      {response && !editResponse && (
         <div className="flex">
           <div className="w-full" />
           <div className="flex flex-col">
@@ -100,7 +103,16 @@ export function ReviewDetailsView(props: ReviewDetailsViewProps) {
               <span className="text-gray-500 font-bold mr-2">{restaurant.owner?.name}</span>replied:
             </div>
             <div className="flex">
-              <div className="ml-4 mt-2">
+              {isEditAllowed && !editReview && (
+                <Shell.ButtonEdit {...{
+                  className: 'ml-4 mr-4 text-gray-500 self-start mt-2',
+                  onClick: e => {
+                    e.preventDefault();
+                    setEditResponse(true);
+                  },
+                }} />
+              )}
+              <div className="mt-2 mr-2">
                 <Shell.DeleteItem {...{
                   error: restaurantStore.deleteReviewResponse.error,
                   executeDelete: async () => {
@@ -109,11 +121,35 @@ export function ReviewDetailsView(props: ReviewDetailsViewProps) {
                 }} />
               </div>
               <div
-                className="self-end mx-4 whitespace-no-wrap px-4 py-2 border-teal-500 rounded-lg bg-green-200 italic"
+                className="self-end mr-4 whitespace-no-wrap px-4 py-2 border-teal-500 rounded-lg bg-green-200 italic"
                 dangerouslySetInnerHTML={{__html: sanitize(response.comment)}}
               />
             </div>
           </div>
+        </div>
+      )}
+      {editResponse && (
+        <div className="flex bg-gray-200 mt-2">
+          <Shell.CommentEdit {...{
+            className: 'w-full',
+            value: reviewResponse,
+            onChange: setReviewResponse,
+          }} />
+          <Shell.ButtonAccept {...{
+            className: 'text-green-500 mx-2',
+            onClick: async () => {
+              response.comment = reviewResponse;
+              await restaurantStore.updateReviewResponse(review, response);
+              setEditResponse(false);
+            },
+          }} />
+          <Shell.ButtonCancel{...{
+            className: 'text-teal-500 mr-4',
+            onClick: () => {
+              setReviewResponse(response.comment);
+              setEditResponse(false);
+            },
+          }} />
         </div>
       )}
       <Shell.ReviewResponseAddView {...{

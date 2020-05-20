@@ -255,6 +255,21 @@ export class RestaurantService {
       return Promise.reject(error);
     }
   }
+
+  async updateReviewResponse(review: Review, response: ReviewResponse) {
+    try {
+      await this.reviewResponseApi.reviewResponseControllerDelete({
+        id: review.id!,
+      });
+      return await this.reviewResponseApi.reviewResponseControllerCreate({
+        id: review.id!,
+        newReviewResponseInReview: response,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
 }
 
 const dependencies = [
