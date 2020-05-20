@@ -4,7 +4,6 @@ import React from 'react';
 import {ReactComponent as ReviewSvg} from './news-paper.svg';
 import {ReactComponent as TopSvg} from './align-top.svg';
 import {ReactComponent as BottomSvg} from './align-bottom.svg';
-import {ReactComponent as AverageSvg} from './bar-graph.svg';
 
 export function RestaurantSummaryView({Shell, restaurant}: RestaurantSummaryViewProps) {
   return (
@@ -17,7 +16,7 @@ export function RestaurantSummaryView({Shell, restaurant}: RestaurantSummaryView
         <div className="ml-2 font-bold">{restaurant.reviews?.length || 0}</div>
       </div>
       <div className="w-1/6 flex justify-center">
-        <AvgIcon/>
+        <Shell.StarIcon className="text-yellow-500" />
         <div className="ml-2 font-bold">{avgReview(restaurant)}</div>
       </div>
       <div className="w-1/6 flex justify-center">
@@ -55,14 +54,6 @@ function MinIcon() {
   return (
     <div className="inline-block h-4 w-4 text-blue-400 mt-1">
       <BottomSvg stroke="currentColor" />
-    </div>
-  );
-}
-
-function AvgIcon() {
-  return (
-    <div className="inline-block h-4 w-4 text-blue-400 mt-1">
-      <AverageSvg stroke="currentColor" />
     </div>
   );
 }

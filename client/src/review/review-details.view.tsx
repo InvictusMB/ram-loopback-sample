@@ -3,8 +3,6 @@ import {format} from 'date-fns';
 
 import {RestaurantWithRelations, ReviewWithRelations} from '../openapi/models';
 
-import {ReactComponent as StarSvg} from './star.svg';
-
 export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsViewProps) {
   const response = (review.reviewResponses ?? [])[0];
 
@@ -15,8 +13,7 @@ export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsView
         <div className="text-center text-gray-500 font-bold ml-2">{review.author?.name}</div>
         <div className="w-full" />
         <div className="flex justify-center mr-4">
-          <StarIcon />
-          <div className="ml-2 font-bold">{review.rating}</div>
+          <Shell.RatingDisplay rating={review.rating} />
         </div>
         <div className="flex justify-center flex-shrink-0 mr-4">
           Date of visit:
@@ -57,13 +54,6 @@ export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsView
   );
 }
 
-function StarIcon() {
-  return (
-    <div className="inline-block h-4 w-4 text-yellow-500 mt-1">
-      <StarSvg stroke="currentColor" />
-    </div>
-  );
-}
 
 const dependencies = [
   Injected.Shell,
