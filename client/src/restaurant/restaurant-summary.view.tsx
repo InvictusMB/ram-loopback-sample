@@ -1,18 +1,54 @@
 import _ from 'lodash';
-import React from 'react';
+import React, {useState} from 'react';
 
 import {useHistory} from '../core';
-import {RestaurantWithRelations} from '../openapi';
+import {RestaurantWithRelations, UserRolesEnum} from '../openapi';
+import {isAllowed} from '../utils';
 
 import {ReactComponent as ReviewSvg} from './news-paper.svg';
 import {ReactComponent as TopSvg} from './align-top.svg';
 import {ReactComponent as BottomSvg} from './align-bottom.svg';
 
-export function RestaurantSummaryView({Shell, restaurant, restaurantStore}: RestaurantSummaryViewProps) {
+export function RestaurantSummaryView(props: RestaurantSummaryViewProps) {
+  const {Shell, restaurant, restaurantStore, userProfileStore} = props;
   const history = useHistory();
+  const [edit, setEdit] = useState(false);
+  const [name, setName] = useState(restaurant.name);
+
+  const allowedRoles = [
+    UserRolesEnum.Admin,
+  ];
+  const isEditAllowed = isAllowed(allowedRoles, userProfileStore.userProfile);
+
   return (
     <div className="w-full h-10 hover:bg-teal-100 flex pt-2">
-      <div className="w-full pl-4 font-semibold text-gray-500">{restaurant.name}</div>
+      <div className="w-full pl-4 font-semibold text-gray-500">
+        {!edit && restaurant.name}
+        {edit && (
+          <Shell.InlineEdit {...{
+            value: name,
+            onChange: setName,
+            onCancel: () => {
+              setName(restaurant.name);
+              setEdit(false);
+            },
+            onAccept: async () => {
+              restaurant.name = name;
+              await restaurantStore.update(restaurant);
+              setEdit(false);
+            },
+          }} />
+        )}
+        {isEditAllowed && !edit && (
+          <Shell.ButtonEdit {...{
+            className: 'ml-2',
+            onClick: e => {
+              e.preventDefault();
+              setEdit(true);
+            },
+          }} />
+        )}
+      </div>
       <div className="-mt-1 w-16"><Shell.Avatar id={restaurant.ownerId} /></div>
       <div className="w-1/6 text-center text-gray-500 font-bold ml-2">{restaurant.owner?.name}</div>
       <div className="w-1/6 justify-center flex ml-4">
@@ -69,6 +105,7 @@ function MinIcon() {
 const dependencies = [
   Injected.Shell,
   Injected.restaurantStore,
+  Injected.userProfileStore,
 ] as const;
 Object.assign(RestaurantSummaryView, {[Symbol.for('ram.deps')]: dependencies});
 

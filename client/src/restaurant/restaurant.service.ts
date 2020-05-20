@@ -186,6 +186,18 @@ export class RestaurantService {
     }
   }
 
+  async updateRestaurant(restaurant: Restaurant) {
+    try {
+      await this.restaurantApi.restaurantControllerReplaceById({
+        id: restaurant.id!,
+        restaurant,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
+
   async createReview(restaurant: Restaurant, review: NewReviewInRestaurant) {
     try {
       return await this.restaurantReviewApi.restaurantReviewControllerCreate({

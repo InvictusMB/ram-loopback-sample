@@ -4,7 +4,6 @@ import {UserRolesEnum} from '../../openapi';
 import {isAllowed} from '../../utils';
 
 import {ReactComponent as DeleteSvg} from './circle-with-cross.svg';
-import {ReactComponent as ConfirmSvg} from './check.svg';
 
 enum DeleteState {
   Initial = 'INITIAL',
@@ -66,16 +65,14 @@ export function DeleteItem(props: DeleteItemProps) {
   if (state === DeleteState.Requested) {
     return (
       <div className="w-1/6 flex justify-evenly">
-        <button
-          className="transition duration-200 ease-in-out transform hover:scale-150"
+        <Shell.ButtonAccept
+          className="text-green-500 mx-1"
           onClick={async e => {
-            prevent(e);
+            prevent(e as React.MouseEvent);
             setState(DeleteState.InProgress);
             await executeDelete();
           }}
-        >
-          <ConfirmIcon />
-        </button>
+        />
         <Shell.ButtonCancel {...{
           onClick: (e: React.MouseEvent) => {
             prevent(e);
@@ -93,14 +90,6 @@ function DeleteIcon() {
   return (
     <div className="inline-block w-6 h-6 text-red-500">
       <DeleteSvg className="stroke-current fill-current" />
-    </div>
-  );
-}
-
-function ConfirmIcon() {
-  return (
-    <div className="inline-block h-4 w-4 text-green-500">
-      <ConfirmSvg stroke="currentColor" />
     </div>
   );
 }

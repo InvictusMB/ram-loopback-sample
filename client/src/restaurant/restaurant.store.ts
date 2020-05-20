@@ -29,6 +29,10 @@ export class RestaurantStore {
     this.restaurants = fp.filter(r => r.id !== restaurant.id, this.restaurants);
   });
 
+  update = task.resolved(async (restaurant: Restaurant) => {
+    await this.restaurantService.updateRestaurant(restaurant);
+  });
+
   loadDetails = task.resolved(async (restaurantId: string) => {
     this.restaurantDetails = await this.restaurantService.getRestaurantDetails(restaurantId);
     this.restaurantDetails.reviews = await this.restaurantService.getRestaurantReviews(restaurantId);
