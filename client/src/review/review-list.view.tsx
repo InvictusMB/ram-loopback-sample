@@ -1,3 +1,4 @@
+import fp from 'lodash/fp';
 import React from 'react';
 import {RestaurantWithRelations} from '../openapi/models';
 
@@ -12,9 +13,10 @@ export function ReviewListView({Shell, restaurantStore, restaurant}: ReviewListV
     return null;
   }
 
+  const sorted = fp.orderBy(['date'], ['desc'], restaurant.reviews);
   return (
     <div>
-      {restaurant.reviews.map(review => (
+      {sorted.map(review => (
         <Shell.ReviewDetailsView {...{
           key: review.id,
           review,
