@@ -11,6 +11,7 @@ import {
   RestaurantReviewControllerApi,
   Review,
   ReviewControllerApi,
+  ReviewResponse,
   ReviewResponseControllerApi,
   ReviewWithRelations,
   User,
@@ -197,11 +198,33 @@ export class RestaurantService {
     }
   }
 
+  async deleteReview(review: Review) {
+    try {
+      await this.reviewApi.reviewControllerDeleteById({
+        id: review.id!,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
+
   async createReviewResponse(review: Review, response: NewReviewResponseInReview) {
     try {
       return await this.reviewResponseApi.reviewResponseControllerCreate({
         id: review.id!,
         newReviewResponseInReview: response,
+      });
+    } catch (response) {
+      const error = await this.apiService.parseResponseError(response);
+      return Promise.reject(error);
+    }
+  }
+
+  async deleteReviewResponse(response: ReviewResponse) {
+    try {
+      await this.reviewResponseApi.reviewResponseControllerDelete({
+        id: response.id!,
       });
     } catch (response) {
       const error = await this.apiService.parseResponseError(response);

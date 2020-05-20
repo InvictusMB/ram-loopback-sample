@@ -4,7 +4,7 @@ import sanitize from 'sanitize-html';
 
 import {RestaurantWithRelations, ReviewWithRelations} from '../openapi/models';
 
-export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsViewProps) {
+export function ReviewDetailsView({Shell, review, restaurant, restaurantStore}: ReviewDetailsViewProps) {
   const response = (review.reviewResponses ?? [])[0];
 
   return (
@@ -27,10 +27,20 @@ export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsView
             <div className="text-gray-500 font-bold mr-2">{review.author?.name}</div>
             <div>wrote:</div>
           </div>
-          <div
-            className="self-end ml-10 px-4 py-2 border-teal-500 rounded-lg bg-gray-200 italic"
-            dangerouslySetInnerHTML={{__html: sanitize(review.comment)}}
-          />
+          <div className="flex">
+            <div
+              className="self-end whitespace-no-wrap ml-10 px-4 py-2 border-teal-500 rounded-lg bg-gray-200 italic"
+              dangerouslySetInnerHTML={{__html: sanitize(review.comment)}}
+            />
+            <div className="ml-4 mt-2">
+              <Shell.DeleteItem {...{
+                error: restaurantStore.deleteReview.error,
+                executeDelete: async () => {
+                  await restaurantStore.deleteReview(review);
+                },
+              }} />
+            </div>
+          </div>
         </div>
         <div className="w-full" />
       </div>
@@ -44,10 +54,20 @@ export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsView
               </div>
               <span className="text-gray-500 font-bold mr-2">{restaurant.owner?.name}</span>replied:
             </div>
-            <div
-              className="self-end mx-4 flex-grow-0 px-4 py-2 border-teal-500 rounded-lg bg-green-200 italic"
-              dangerouslySetInnerHTML={{__html: sanitize(response.comment)}}
-            />
+            <div className="flex">
+              <div className="ml-4 mt-2">
+                <Shell.DeleteItem {...{
+                  error: restaurantStore.deleteReviewResponse.error,
+                  executeDelete: async () => {
+                    await restaurantStore.deleteReviewResponse(review, response);
+                  },
+                }} />
+              </div>
+              <div
+                className="self-end mx-4 whitespace-no-wrap px-4 py-2 border-teal-500 rounded-lg bg-green-200 italic"
+                dangerouslySetInnerHTML={{__html: sanitize(response.comment)}}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -62,6 +82,7 @@ export function ReviewDetailsView({Shell, review, restaurant}: ReviewDetailsView
 
 const dependencies = [
   Injected.Shell,
+  Injected.restaurantStore,
 ] as const;
 Object.assign(ReviewDetailsView, {[Symbol.for('ram.deps')]: dependencies});
 

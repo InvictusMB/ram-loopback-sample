@@ -1,7 +1,13 @@
 import fp from 'lodash/fp';
 
 import {computed, IReactionDisposer, observable, reaction, task} from '../core';
-import {NewRestaurant, RestaurantWithRelations, ReviewWithRelations, UserWithRelations} from '../openapi';
+import {
+  NewRestaurant,
+  RestaurantWithRelations,
+  ReviewResponse,
+  ReviewWithRelations,
+  UserWithRelations,
+} from '../openapi';
 
 export class RestaurantStore {
   @observable restaurants: Restaurant[] = [];
@@ -20,7 +26,7 @@ export class RestaurantStore {
 
   delete = task.resolved(async (restaurant: Restaurant) => {
     await this.restaurantService.deleteRestaurant(restaurant);
-    await this.load();
+    this.restaurants = fp.filter(r => r.id !== restaurant.id, this.restaurants);
   });
 
   loadDetails = task.resolved(async (restaurantId: string) => {
@@ -37,6 +43,20 @@ export class RestaurantStore {
       current.reviews.push(created);
     }
     return created;
+  });
+
+  deleteReview = task.resolved(async (review) => {
+    await this.restaurantService.deleteReview(review);
+    if (!this.restaurantDetails) {
+      return;
+    }
+    const reviews = this.restaurantDetails.reviews;
+    this.restaurantDetails.reviews = fp.filter(r => r.id !== review.id, reviews);
+  });
+
+  deleteReviewResponse = task.resolved(async (review: ReviewWithRelations, response: ReviewResponse) => {
+    await this.restaurantService.deleteReviewResponse(response);
+    review.reviewResponses = [];
   });
 
   createReviewResponse = task.resolved(async (review, response) => {

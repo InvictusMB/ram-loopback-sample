@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 
-import {useHistory} from '../core';
-import {Restaurant, UserRolesEnum} from '../openapi';
-import {isAllowed} from '../utils';
+import {UserRolesEnum} from '../../openapi';
+import {isAllowed} from '../../utils';
 
 import {ReactComponent as DeleteSvg} from './circle-with-cross.svg';
 import {ReactComponent as ConfirmSvg} from './check.svg';
@@ -13,11 +12,9 @@ enum DeleteState {
   InProgress = 'IN_PROGRESS',
 }
 
-export function RestaurantDeleteView(props: RestaurantDeleteViewProps) {
-  const {Shell, userProfileStore, restaurantStore, restaurant} = props;
+export function DeleteItem(props: DeleteItemProps) {
+  const {Shell, userProfileStore, error, executeDelete} = props;
   const [state, setState] = useState(DeleteState.Initial);
-
-  const history = useHistory();
 
   if (!userProfileStore.userProfile) {
     return null;
@@ -29,8 +26,6 @@ export function RestaurantDeleteView(props: RestaurantDeleteViewProps) {
   if (!isAllowed(allowedRoles, userProfileStore.userProfile)) {
     return null;
   }
-
-  const error = restaurantStore.delete.error;
 
   if (state === DeleteState.InProgress && !error) {
     return (
@@ -76,8 +71,7 @@ export function RestaurantDeleteView(props: RestaurantDeleteViewProps) {
           onClick={async e => {
             prevent(e);
             setState(DeleteState.InProgress);
-            await restaurantStore.delete(restaurant).catch();
-            history.push(`/restaurants`);
+            await executeDelete();
           }}
         >
           <ConfirmIcon />
@@ -116,10 +110,11 @@ const dependencies = [
   Injected.userProfileStore,
   Injected.restaurantStore,
 ] as const;
-Object.assign(RestaurantDeleteView, {[Symbol.for('ram.deps')]: dependencies});
+Object.assign(DeleteItem, {[Symbol.for('ram.deps')]: dependencies});
 
-type RestaurantDeleteViewProps = PickInjected<typeof dependencies> & {
-  restaurant: Restaurant
+type DeleteItemProps = PickInjected<typeof dependencies> & {
+  error?: any,
+  executeDelete: () => Promise<void>,
 };
 
 function prevent(e: React.MouseEvent) {

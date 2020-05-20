@@ -1,11 +1,15 @@
 import _ from 'lodash';
 import React from 'react';
 
+import {useHistory} from '../core';
+import {RestaurantWithRelations} from '../openapi';
+
 import {ReactComponent as ReviewSvg} from './news-paper.svg';
 import {ReactComponent as TopSvg} from './align-top.svg';
 import {ReactComponent as BottomSvg} from './align-bottom.svg';
 
-export function RestaurantSummaryView({Shell, restaurant}: RestaurantSummaryViewProps) {
+export function RestaurantSummaryView({Shell, restaurant, restaurantStore}: RestaurantSummaryViewProps) {
+  const history = useHistory();
   return (
     <div className="w-full h-10 hover:bg-teal-100 flex pt-2">
       <div className="w-full pl-4 font-semibold text-gray-500">{restaurant.name}</div>
@@ -20,15 +24,19 @@ export function RestaurantSummaryView({Shell, restaurant}: RestaurantSummaryView
         <div className="ml-2 font-bold">{avgReview(restaurant)}</div>
       </div>
       <div className="w-1/6 flex justify-center">
-        <MaxIcon/>
+        <MaxIcon />
         <div className="ml-2 font-bold">{maxReview(restaurant)}</div>
       </div>
       <div className="w-1/6 flex justify-center">
-        <MinIcon/>
+        <MinIcon />
         <div className="ml-2 font-bold">{minReview(restaurant)}</div>
       </div>
-      <Shell.RestaurantDeleteView {...{
-        restaurant,
+      <Shell.DeleteItem {...{
+        error: restaurantStore.delete.error,
+        executeDelete: async () => {
+          await restaurantStore.delete(restaurant);
+          history.push('/restaurants');
+        },
       }} />
     </div>
   );
@@ -60,15 +68,16 @@ function MinIcon() {
 
 const dependencies = [
   Injected.Shell,
+  Injected.restaurantStore,
 ] as const;
 Object.assign(RestaurantSummaryView, {[Symbol.for('ram.deps')]: dependencies});
 
-type RestaurantSummaryViewProps = {restaurant: Restaurant} & PickInjected<typeof dependencies>;
+type RestaurantSummaryViewProps = PickInjected<typeof dependencies> & {
+  restaurant: RestaurantWithRelations
+};
 
-type Restaurant = RestaurantStore['restaurants'][number];
-type RestaurantStore = PickInjected<[typeof Injected.restaurantStore]>[typeof Injected.restaurantStore];
 
-function maxReview(r: Restaurant) {
+function maxReview(r: RestaurantWithRelations) {
   const ratings = (r.reviews ?? []).map(rv => rv.rating);
   if (!ratings.length) {
     return '-';
@@ -76,7 +85,7 @@ function maxReview(r: Restaurant) {
   return Math.max(...ratings);
 }
 
-function minReview(r: Restaurant) {
+function minReview(r: RestaurantWithRelations) {
   const ratings = (r.reviews ?? []).map(rv => rv.rating);
   if (!ratings.length) {
     return '-';
@@ -84,7 +93,7 @@ function minReview(r: Restaurant) {
   return Math.min(...ratings);
 }
 
-function avgReview(r: Restaurant) {
+function avgReview(r: RestaurantWithRelations) {
   const ratings = (r.reviews ?? []).map(rv => rv.rating);
   if (!ratings.length) {
     return '-';
