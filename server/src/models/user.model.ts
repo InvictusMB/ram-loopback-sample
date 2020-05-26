@@ -3,7 +3,7 @@
 import {Entity, hasOne, model, property} from '@loopback/repository';
 import {UserProfile} from '@loopback/security';
 import {UserCredentials} from './user-credentials.model';
-import {roleSchema, UserRole} from './user-role.model';
+import {roleSchema, USER_ROLE} from './user-role.model';
 
 @model({
   settings: {
@@ -39,7 +39,7 @@ export class User extends Entity {
   @property.array('string', {
     jsonSchema: roleSchema
   })
-  roles: UserRole[];
+  roles: USER_ROLE[];
 
   constructor(data?: Partial<User>) {
     super(data);

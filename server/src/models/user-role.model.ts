@@ -1,10 +1,12 @@
 import {JsonSchemaWithExtensions} from '@loopback/repository';
 
-const USER_ROLES = ['user', 'business', 'admin'] as const;
-
-export type UserRole = typeof USER_ROLES[number];
+export enum USER_ROLE {
+  USER = 'user',
+  BUSINESS = 'business',
+  ADMIN = 'admin'
+}
 
 export const roleSchema: JsonSchemaWithExtensions = {
   type: 'string',
-  enum: USER_ROLES.slice(),
+  enum: Object.values(USER_ROLE),
 };

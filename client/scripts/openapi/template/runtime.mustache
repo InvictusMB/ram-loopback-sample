@@ -2,7 +2,7 @@
 /* eslint-disable */
 {{>licenseInfo}}
 
-export const BASE_PATH = "{{{basePath}}}".replace(/\/+$/, "");
+export const BASE_PATH = "{{{myBasePath}}}".replace(/\/+$/, "");
 
 const isBlob = (value: any) => typeof Blob !== 'undefined' && value instanceof Blob;
 
@@ -116,7 +116,7 @@ export const COLLECTION_FORMATS = {
 
 export type FetchAPI = {{#typescriptThreePlus}}WindowOrWorkerGlobalScope{{/typescriptThreePlus}}{{^typescriptThreePlus}}GlobalFetch{{/typescriptThreePlus}}['fetch'];
 
-export interface ConfigurationParameters {
+export type ConfigurationParameters = {
     basePath?: string; // override base path
     fetchApi?: FetchAPI; // override for fetch implementation
     middleware?: Middleware[]; // middleware to apply before/after fetch requests
@@ -182,18 +182,20 @@ export class Configuration {
 }
 
 export type Json = any;
+export type FreeFormObject = { [key: string]: undefined | FreeFormProp | FreeFormProp[] };
+export type FreeFormProp = string | number | boolean | FreeFormObject | null;
 export type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD';
 export type HTTPHeaders = { [key: string]: string };
-export type HTTPQuery = { [key: string]: string | number | null | boolean | Array<string | number | null | boolean> | HTTPQuery };
+export type HTTPQuery = FreeFormObject;
 export type HTTPBody = Json | FormData | URLSearchParams;
 export type ModelPropertyNaming = 'camelCase' | 'snake_case' | 'PascalCase' | 'original';
 
-export interface FetchParams {
+export type FetchParams = {
     url: string;
     init: RequestInit;
 }
 
-export interface RequestOpts {
+export type RequestOpts = {
     path: string;
     method: HTTPMethod;
     headers: HTTPHeaders;
@@ -241,17 +243,17 @@ export function canConsumeForm(consumes: Consume[]): boolean {
     return false;
 }
 
-export interface Consume {
+export type Consume = {
     contentType: string
 }
 
-export interface RequestContext {
+export type RequestContext = {
     fetch: FetchAPI;
     url: string;
     init: RequestInit;
 }
 
-export interface ResponseContext {
+export type ResponseContext = {
     fetch: FetchAPI;
     url: string;
     init: RequestInit;
@@ -263,12 +265,12 @@ export interface Middleware {
     post?(context: ResponseContext): Promise<Response | void>;
 }
 
-export interface ApiResponse<T> {
+export type ApiResponse<T> = {
     raw: Response;
     value(): Promise<T>;
 }
 
-export interface ResponseTransformer<T> {
+export type ResponseTransformer<T> = {
     (json: any): T;
 }
 

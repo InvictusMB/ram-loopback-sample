@@ -2,15 +2,15 @@
 
 import {model, property} from '@loopback/repository';
 import {LoginCredentials} from './login-credentials.model';
-import {roleSchema, UserRole} from './user-role.model';
+import {roleSchema, USER_ROLE} from './user-role.model';
 import {User} from './user.model';
 
 @model()
 export class NewUserRequest extends LoginCredentials {
   @property.array('string', {
-    jsonSchema: roleSchema
+    jsonSchema: roleSchema,
   })
-  roles?: UserRole[];
+  roles?: USER_ROLE[];
 
   constructor(data?: Partial<NewUserRequest>) {
     super(data);
@@ -20,6 +20,6 @@ export class NewUserRequest extends LoginCredentials {
 export function toUser(newUserRequest: NewUserRequest) {
   return new User({
     name: newUserRequest.login,
-    roles: newUserRequest.roles ?? ['user'],
+    roles: newUserRequest.roles ?? [USER_ROLE.USER],
   });
 }

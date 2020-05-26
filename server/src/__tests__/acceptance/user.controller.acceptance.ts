@@ -2,7 +2,7 @@ import {Client, expect} from '@loopback/testlab';
 import {HTTPError} from 'superagent';
 
 import {ServerApplication} from '../../application';
-import {User, UserRole} from '../../models';
+import {User, USER_ROLE} from '../../models';
 import {UserRepository} from '../../repositories';
 import {
   createAUser,
@@ -24,9 +24,9 @@ describe('UserController', () => {
   let givenAnOwner: () => Promise<User>;
   let givenAnAdmin: () => Promise<User>;
 
-  const regularRoles = ['user'] as UserRole[];
-  const ownerRoles = ['user', 'business'] as UserRole[];
-  const adminRoles = ['user', 'admin'] as UserRole[];
+  const regularRoles = [USER_ROLE.USER];
+  const ownerRoles = [USER_ROLE.USER, USER_ROLE.BUSINESS];
+  const adminRoles = [USER_ROLE.USER, USER_ROLE.ADMIN];
   const userData = {
     name: 'user',
     roles: regularRoles,
@@ -39,8 +39,8 @@ describe('UserController', () => {
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());
     givenAUser = createAUser.bind(null, app, userPassword);
-    givenAnOwner = createAUser.bind(null, app, userPassword, ['user', 'business'] as UserRole[]);
-    givenAnAdmin = createAUser.bind(null, app, userPassword, ['user', 'admin'] as UserRole[]);
+    givenAnOwner = createAUser.bind(null, app, userPassword, ownerRoles);
+    givenAnAdmin = createAUser.bind(null, app, userPassword, adminRoles);
     userRepo = await app.get('repositories.UserRepository');
   });
   before(migrateSchema);

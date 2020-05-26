@@ -1,7 +1,7 @@
 import {Client, expect} from '@loopback/testlab';
 
 import {ServerApplication} from '../../application';
-import {Restaurant, Review, User, UserRole} from '../../models';
+import {Restaurant, Review, User, USER_ROLE} from '../../models';
 import {RestaurantRepository, ReviewRepository, UserRepository} from '../../repositories';
 import {
   createARestaurant,
@@ -35,8 +35,8 @@ describe('RestaurantReviewController', () => {
   before('setupApplication', async () => {
     ({app, client} = await setupApplication());
     givenAUser = createAUser.bind(null, app, userPassword);
-    givenAnOwner = createAUser.bind(null, app, userPassword, ['user', 'business'] as UserRole[]);
-    givenAnAdmin = createAUser.bind(null, app, userPassword, ['user', 'admin'] as UserRole[]);
+    givenAnOwner = createAUser.bind(null, app, userPassword, [USER_ROLE.USER, USER_ROLE.BUSINESS]);
+    givenAnAdmin = createAUser.bind(null, app, userPassword, [USER_ROLE.USER, USER_ROLE.ADMIN]);
     givenARestaurant = createARestaurant.bind(null, app);
     givenAReview = await createAReviewBuilder(app);
     userRepo = await app.get('repositories.UserRepository');

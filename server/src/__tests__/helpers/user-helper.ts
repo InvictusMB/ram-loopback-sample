@@ -1,9 +1,9 @@
 import {ServerApplication} from '../../application';
 import {PasswordHasherBindings} from '../../keys';
-import {User, UserRole} from '../../models';
+import {User, USER_ROLE} from '../../models';
 import {UserRepository} from '../../repositories';
 
-export async function createAUser(app: ServerApplication, userPassword: string, roles: UserRole[] = ['user']) {
+export async function createAUser(app: ServerApplication, userPassword: string, roles = [USER_ROLE.USER]) {
   const userRepo: UserRepository = await app.get('repositories.UserRepository');
   const passwordHasher = await app.get(PasswordHasherBindings.PASSWORD_HASHER);
 

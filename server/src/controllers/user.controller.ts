@@ -1,39 +1,18 @@
 // Based on loopback4-example-shopping
 
-import _ from 'lodash';
+import {authenticate, TokenService, UserService} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
 import {Filter, repository} from '@loopback/repository';
-import {NewUserRequest, toUser} from '../models/new-user-request.model';
-import {
-  authenticate,
-  TokenService,
-  UserService,
-} from '@loopback/authentication';
-import {authorize} from '@loopback/authorization';
-import {UserProfile, securityId, SecurityBindings} from '@loopback/security';
-import {
-  post,
-  put,
-  param,
-  get,
-  del,
-  requestBody,
-  HttpErrors,
-  getModelSchemaRef,
-} from '@loopback/rest';
-import {User, LoginCredentials} from '../models';
-import {UserRepository} from '../repositories';
-import {
-  roleAuthorization,
-  routeAuthorization,
-  PasswordHasher,
-} from '../services';
+import {del, get, getModelSchemaRef, HttpErrors, param, post, put, requestBody} from '@loopback/rest';
+import {SecurityBindings, securityId, UserProfile} from '@loopback/security';
+import _ from 'lodash';
 
-import {
-  TokenServiceBindings,
-  PasswordHasherBindings,
-  UserServiceBindings,
-} from '../keys';
+import {PasswordHasherBindings, TokenServiceBindings, UserServiceBindings} from '../keys';
+import {LoginCredentials, User, USER_ROLE} from '../models';
+import {NewUserRequest, toUser} from '../models/new-user-request.model';
+import {UserRepository} from '../repositories';
+import {PasswordHasher, roleAuthorization, routeAuthorization} from '../services';
 import {OPERATION_SECURITY_SPEC} from '../utils/security-spec';
 
 export class UserController {
@@ -104,8 +83,8 @@ export class UserController {
     })
     newUserRequest: NewUserRequest,
   ): Promise<User> {
-    if (!currentUserProfile.roles.includes('admin')) {
-      newUserRequest.roles = ['user'];
+    if (!currentUserProfile.roles.includes(USER_ROLE.ADMIN)) {
+      newUserRequest.roles = [USER_ROLE.USER];
     }
     // FIXME: should be enforced by request validator
     // see https://github.com/strongloop/loopback-next/issues/4645
