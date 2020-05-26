@@ -4,6 +4,7 @@
 /src/ram-context.d.ts
 /src/ram-context.js
 /src/styles/tailwind.css
+/src/openapi/
 
 # dependencies
 /node_modules

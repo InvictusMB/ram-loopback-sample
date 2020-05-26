@@ -9,7 +9,7 @@
     "install:client": "cd client && npm install",
     "install:server": "cd server && npm install",
     "start": "npm-run-all -p start:server start:client",
-    "start:client": "wait-on http://localhost:3000/api/ && npm --prefix client start",
+    "start:client": "npm --prefix client start",
     "start:server": "npm --prefix server start"
   },
   "devDependencies": {
