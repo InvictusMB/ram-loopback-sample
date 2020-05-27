@@ -76,7 +76,7 @@ export class ServerApplication extends BootMixin(
 
   setUpBindings(): void {
     if (this.options.disablePersistence) {
-      this.bind('datasources.config.memory').to({
+      this.bind('datasources.config.main').to({
         name: 'memory',
         connector: 'memory',
         localStorage: 'restaurant-reviews-db'

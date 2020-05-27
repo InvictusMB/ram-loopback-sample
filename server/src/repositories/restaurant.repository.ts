@@ -11,7 +11,7 @@ import {
   Review,
   User,
 } from '../models';
-import {MemoryDataSource} from '../datasources';
+import {MainDataDource} from '../datasources';
 import {ReviewRepository} from './review.repository';
 import {UserRepository} from './user.repository';
 
@@ -26,7 +26,7 @@ export class RestaurantRepository extends DefaultCrudRepository<
   public readonly owner: BelongsToAccessor<User, typeof Restaurant.prototype.id>;
 
   constructor(
-    @inject('datasources.memory') dataSource: MemoryDataSource,
+    @inject('datasources.main') dataSource: MainDataDource,
     @repository.getter('ReviewRepository') protected reviewRepositoryGetter: Getter<ReviewRepository>, @repository.getter('UserRepository') protected userRepositoryGetter: Getter<UserRepository>,
   ) {
     super(Restaurant, dataSource);

@@ -1,6 +1,6 @@
 import {DefaultCrudRepository, repository, BelongsToAccessor, HasManyRepositoryFactory} from '@loopback/repository';
 import {Review, ReviewRelations, Restaurant, User, ReviewResponse} from '../models';
-import {MemoryDataSource} from '../datasources';
+import {MainDataDource} from '../datasources';
 import {inject, Getter} from '@loopback/core';
 import {RestaurantRepository} from './restaurant.repository';
 import {UserRepository} from './user.repository';
@@ -19,7 +19,7 @@ export class ReviewRepository extends DefaultCrudRepository<
   public readonly reviewResponses: HasManyRepositoryFactory<ReviewResponse, typeof Review.prototype.id>;
 
   constructor(
-    @inject('datasources.memory') dataSource: MemoryDataSource,
+    @inject('datasources.main') dataSource: MainDataDource,
     @repository.getter('RestaurantRepository')
     protected restaurantRepositoryGetter: Getter<RestaurantRepository>,
     @repository.getter('UserRepository')
