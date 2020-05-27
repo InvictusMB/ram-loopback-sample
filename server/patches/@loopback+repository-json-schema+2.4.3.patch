@@ -1,0 +1,427 @@
+diff --git a/node_modules/@loopback/repository-json-schema/dist/build-schema.js b/node_modules/@loopback/repository-json-schema/dist/build-schema.js
+index aadab62..ae19a07 100644
+--- a/node_modules/@loopback/repository-json-schema/dist/build-schema.js
++++ b/node_modules/@loopback/repository-json-schema/dist/build-schema.js
+@@ -6,7 +6,7 @@
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.modelToJsonSchema = exports.getNavigationalPropertyForRelation = exports.metaToJsonProperty = exports.isArrayType = exports.stringTypeToWrapper = exports.getJsonSchemaRef = exports.getJsonSchema = exports.buildModelCacheKey = void 0;
+ const tslib_1 = require("tslib");
+-const context_1 = require("@loopback/context");
++const core_1 = require("@loopback/core");
+ const repository_1 = require("@loopback/repository");
+ const debug_1 = tslib_1.__importDefault(require("debug"));
+ const util_1 = require("util");
+@@ -35,7 +35,7 @@ exports.buildModelCacheKey = buildModelCacheKey;
+ function getJsonSchema(ctor, options) {
+     // In the near future the metadata will be an object with
+     // different titles as keys
+-    const cached = context_1.MetadataInspector.getClassMetadata(keys_1.JSON_SCHEMA_KEY, ctor);
++    const cached = core_1.MetadataInspector.getClassMetadata(keys_1.JSON_SCHEMA_KEY, ctor);
+     const key = buildModelCacheKey(options);
+     let schema = cached === null || cached === void 0 ? void 0 : cached[key];
+     if (!schema) {
+@@ -48,7 +48,7 @@ function getJsonSchema(ctor, options) {
+         }
+         else {
+             // Define new metadata and set in cache
+-            context_1.MetadataInspector.defineMetadata(keys_1.JSON_SCHEMA_KEY.key, { [key]: schema }, ctor);
++            core_1.MetadataInspector.defineMetadata(keys_1.JSON_SCHEMA_KEY.key, { [key]: schema }, ctor);
+         }
+     }
+     return schema;
+@@ -236,14 +236,15 @@ function buildSchemaTitle(ctor, meta, options) {
+  * @param options json schema options
+  */
+ function getTitleSuffix(options = {}) {
++    var _a, _b;
+     let suffix = '';
+-    if (options.optional && options.optional.length) {
++    if ((_a = options.optional) === null || _a === void 0 ? void 0 : _a.length) {
+         suffix += `Optional_${options.optional.join('-')}_`;
+     }
+     else if (options.partial) {
+         suffix += 'Partial';
+     }
+-    if (options.exclude && options.exclude.length) {
++    if ((_b = options.exclude) === null || _b === void 0 ? void 0 : _b.length) {
+         suffix += `Excluding_${options.exclude.join('-')}_`;
+     }
+     if (options.includeRelations) {
+@@ -332,8 +333,46 @@ function modelToJsonSchema(ctor, jsonSchemaOptions = {}) {
+     else if (descriptionSuffix) {
+         result.description = descriptionSuffix;
+     }
++    if (options.includeRelations) {
++        const parentSchema = modelToJsonSchema(ctor, {
++            ...options,
++            includeRelations: false,
++        });
++        const properties = {};
++        for (const r in meta.relations) {
++            const relMeta = meta.relations[r];
++            const targetType = repository_1.resolveType(relMeta.target);
++            // `title` is the unique identity of a schema,
++            // it should be removed from the `options`
++            // when generating the relation or property schemas
++            const targetOptions = { ...options };
++            delete targetOptions.title;
++            const targetSchema = getJsonSchema(targetType, targetOptions);
++            const targetRef = { $ref: `#/definitions/${targetSchema.title}` };
++            const propDef = getNavigationalPropertyForRelation(relMeta, targetRef);
++            properties[relMeta.name] = properties[relMeta.name] || propDef;
++            includeReferencedSchema(targetSchema.title, targetSchema);
++        }
++        result.allOf = [
++            { $ref: `#/definitions/${parentSchema.title}` },
++            {
++                properties,
++            },
++        ];
++        includeReferencedSchema(parentSchema.title, parentSchema);
++        return result;
++    }
++    const ownPropsSchema = {};
++    const parentModel = getParentModel(ctor);
++    const parentMeta = parentModel
++        ? repository_1.ModelMetadataHelper.getModelMetadata(parentModel)
++        : null;
+     for (const p in meta.properties) {
+-        if (options.exclude && options.exclude.includes(p)) {
++        if (isInherited(parentMeta, meta, p)) {
++            debug('Property % is excluded by inheritance', p);
++            continue;
++        }
++        if ((_c = options.exclude) === null || _c === void 0 ? void 0 : _c.includes(p)) {
+             debug('Property % is excluded by %s', p, options.exclude);
+             continue;
+         }
+@@ -341,16 +380,16 @@ function modelToJsonSchema(ctor, jsonSchemaOptions = {}) {
+             // Circular import of model classes can lead to this situation
+             throw new Error(`Property ${ctor.name}.${p} does not have "type" in its definition`);
+         }
+-        result.properties = (_c = result.properties) !== null && _c !== void 0 ? _c : {};
+-        result.properties[p] = result.properties[p] || {};
++        ownPropsSchema.properties = (_d = ownPropsSchema.properties) !== null && _d !== void 0 ? _d : {};
++        ownPropsSchema.properties[p] = ownPropsSchema.properties[p] || {};
+         const metaProperty = Object.assign({}, meta.properties[p]);
+         // populating "properties" key
+-        result.properties[p] = metaToJsonProperty(metaProperty);
++        ownPropsSchema.properties[p] = metaToJsonProperty(metaProperty);
+         // handling 'required' metadata
+         const optional = options.optional.includes(p);
+         if (metaProperty.required && !(partial || optional)) {
+-            result.required = (_d = result.required) !== null && _d !== void 0 ? _d : [];
+-            result.required.push(p);
++            ownPropsSchema.required = (_e = ownPropsSchema.required) !== null && _e !== void 0 ? _e : [];
++            ownPropsSchema.required.push(p);
+         }
+         // populating JSON Schema 'definitions'
+         // shimks: ugly type casting; this should be replaced by logic to throw
+@@ -375,46 +414,42 @@ function modelToJsonSchema(ctor, jsonSchemaOptions = {}) {
+         delete propOptions.title;
+         const propSchema = getJsonSchema(referenceType, propOptions);
+         // JSONSchema6Definition allows both boolean and JSONSchema6 types
+-        if (typeof result.properties[p] !== 'boolean') {
+-            const prop = result.properties[p];
+-            const propTitle = (_e = propSchema.title) !== null && _e !== void 0 ? _e : referenceType.name;
++        if (typeof ownPropsSchema.properties[p] !== 'boolean') {
++            const prop = ownPropsSchema.properties[p];
++            const propTitle = (_f = propSchema.title) !== null && _f !== void 0 ? _f : referenceType.name;
+             const targetRef = { $ref: `#/definitions/${propTitle}` };
+             if (prop.type === 'array' && prop.items) {
+                 // Update $ref for array type
+                 prop.items = targetRef;
+             }
+             else {
+-                result.properties[p] = targetRef;
++                ownPropsSchema.properties[p] = targetRef;
+             }
+             includeReferencedSchema(propTitle, propSchema);
+         }
+     }
+-    result.additionalProperties = meta.settings.strict === false;
+-    debug('  additionalProperties?', result.additionalProperties);
+-    if (options.includeRelations) {
+-        for (const r in meta.relations) {
+-            result.properties = (_f = result.properties) !== null && _f !== void 0 ? _f : {};
+-            const relMeta = meta.relations[r];
+-            const targetType = repository_1.resolveType(relMeta.target);
+-            // `title` is the unique identity of a schema,
+-            // it should be removed from the `options`
+-            // when generating the relation or property schemas
+-            const targetOptions = { ...options };
+-            delete targetOptions.title;
+-            const targetSchema = getJsonSchema(targetType, targetOptions);
+-            const targetRef = { $ref: `#/definitions/${targetSchema.title}` };
+-            const propDef = getNavigationalPropertyForRelation(relMeta, targetRef);
+-            result.properties[relMeta.name] =
+-                result.properties[relMeta.name] || propDef;
+-            includeReferencedSchema(targetSchema.title, targetSchema);
+-        }
++    ownPropsSchema.additionalProperties = meta.settings.strict === false;
++    debug('  additionalProperties?', ownPropsSchema.additionalProperties);
++    const hasProperties = !!ownPropsSchema.properties;
++    if (parentModel) {
++        const parentOptions = { ...options };
++        delete parentOptions.title;
++        const parentSchema = modelToJsonSchema(parentModel, parentOptions);
++        result.allOf = [
++            { $ref: `#/definitions/${parentSchema.title}` },
++            hasProperties && ownPropsSchema,
++        ].filter(Boolean);
++        includeReferencedSchema(parentSchema.title, parentSchema);
++    }
++    else {
++        Object.assign(result, ownPropsSchema);
+     }
+     function includeReferencedSchema(name, schema) {
+         var _a, _b;
+         if (!schema || !Object.keys(schema).length)
+             return;
+         // promote nested definition to the top level
+-        if (result !== schema && schema.definitions) {
++        if (result !== (schema === null || schema === void 0 ? void 0 : schema.definitions)) {
+             for (const key in schema.definitions) {
+                 if (key === title)
+                     continue;
+@@ -434,4 +469,18 @@ function modelToJsonSchema(ctor, jsonSchemaOptions = {}) {
+     return result;
+ }
+ exports.modelToJsonSchema = modelToJsonSchema;
++function getParentModel(ctor) {
++    const proto = Object.getPrototypeOf(ctor);
++    const isBaseType = proto.name === 'Model' || proto.name === 'Entity';
++    const isModel = proto instanceof repository_1.Model.constructor;
++    return !isBaseType && isModel ? proto : null;
++}
++function isInherited(parentModel, model, propertyName) {
++    var _a, _b;
++    if (!parentModel) {
++        return false;
++    }
++    // TODO(InvictusMB): deep equality check here?
++    return (((_a = model.properties[propertyName]) === null || _a === void 0 ? void 0 : _a.type) === ((_b = parentModel.properties[propertyName]) === null || _b === void 0 ? void 0 : _b.type));
++}
+ //# sourceMappingURL=build-schema.js.map
+\ No newline at end of file
+diff --git a/node_modules/@loopback/repository-json-schema/dist/build-schema.js.map b/node_modules/@loopback/repository-json-schema/dist/build-schema.js.map
+index 398dc96..8721efc 100644
+--- a/node_modules/@loopback/repository-json-schema/dist/build-schema.js.map
++++ b/node_modules/@loopback/repository-json-schema/dist/build-schema.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"build-schema.js","sourceRoot":"","sources":["../src/build-schema.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"build-schema.js","sourceRoot":"","sources":["../src/build-schema.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/node_modules/@loopback/repository-json-schema/src/build-schema.ts b/node_modules/@loopback/repository-json-schema/src/build-schema.ts
+index a45cd2c..345885d 100644
+--- a/node_modules/@loopback/repository-json-schema/src/build-schema.ts
++++ b/node_modules/@loopback/repository-json-schema/src/build-schema.ts
+@@ -3,9 +3,10 @@
+ // This file is licensed under the MIT License.
+ // License text available at https://opensource.org/licenses/MIT
+ 
+-import {MetadataInspector} from '@loopback/context';
++import {MetadataInspector} from '@loopback/core';
+ import {
+   isBuiltinType,
++  Model,
+   ModelDefinition,
+   ModelMetadataHelper,
+   Null,
+@@ -342,12 +343,12 @@ function buildSchemaTitle<T extends object>(
+ function getTitleSuffix<T extends object>(options: JsonSchemaOptions<T> = {}) {
+   let suffix = '';
+ 
+-  if (options.optional && options.optional.length) {
++  if (options.optional?.length) {
+     suffix += `Optional_${options.optional.join('-')}_`;
+   } else if (options.partial) {
+     suffix += 'Partial';
+   }
+-  if (options.exclude && options.exclude.length) {
++  if (options.exclude?.length) {
+     suffix += `Excluding_${options.exclude.join('-')}_`;
+   }
+   if (options.includeRelations) {
+@@ -462,8 +463,56 @@ export function modelToJsonSchema<T extends object>(
+     result.description = descriptionSuffix;
+   }
+ 
++  if (options.includeRelations) {
++    const parentSchema = modelToJsonSchema(ctor, {
++      ...options,
++      includeRelations: false,
++    });
++    const properties: typeof result.properties = {};
++
++    for (const r in meta.relations) {
++      const relMeta = meta.relations[r];
++      const targetType = resolveType(relMeta.target);
++
++      // `title` is the unique identity of a schema,
++      // it should be removed from the `options`
++      // when generating the relation or property schemas
++      const targetOptions = {...options};
++      delete targetOptions.title;
++
++      const targetSchema = getJsonSchema(targetType, targetOptions);
++      const targetRef = {$ref: `#/definitions/${targetSchema.title}`};
++      const propDef = getNavigationalPropertyForRelation(relMeta, targetRef);
++
++      properties[relMeta.name] = properties[relMeta.name] || propDef;
++      includeReferencedSchema(targetSchema.title!, targetSchema);
++    }
++    result.allOf = [
++      {$ref: `#/definitions/${parentSchema.title}`},
++      {
++        properties,
++      },
++    ];
++    includeReferencedSchema(parentSchema.title!, parentSchema);
++    return result;
++  }
++
++  const ownPropsSchema: Pick<
++    typeof result,
++    'required' | 'properties' | 'additionalProperties'
++  > = {};
++  const parentModel = getParentModel(ctor);
++  const parentMeta = parentModel
++    ? (ModelMetadataHelper.getModelMetadata(parentModel) as ModelDefinition)
++    : null;
++
+   for (const p in meta.properties) {
+-    if (options.exclude && options.exclude.includes(p as keyof T)) {
++    if (isInherited(parentMeta, meta, p)) {
++      debug('Property % is excluded by inheritance', p);
++      continue;
++    }
++
++    if (options.exclude?.includes(p as keyof T)) {
+       debug('Property % is excluded by %s', p, options.exclude);
+       continue;
+     }
+@@ -475,20 +524,20 @@ export function modelToJsonSchema<T extends object>(
+       );
+     }
+ 
+-    result.properties = result.properties ?? {};
+-    result.properties[p] = result.properties[p] || {};
++    ownPropsSchema.properties = ownPropsSchema.properties ?? {};
++    ownPropsSchema.properties[p] = ownPropsSchema.properties[p] || {};
+ 
+     const metaProperty = Object.assign({}, meta.properties[p]);
+ 
+     // populating "properties" key
+-    result.properties[p] = metaToJsonProperty(metaProperty);
++    ownPropsSchema.properties[p] = metaToJsonProperty(metaProperty);
+ 
+     // handling 'required' metadata
+     const optional = options.optional.includes(p as keyof T);
+ 
+     if (metaProperty.required && !(partial || optional)) {
+-      result.required = result.required ?? [];
+-      result.required.push(p);
++      ownPropsSchema.required = ownPropsSchema.required ?? [];
++      ownPropsSchema.required.push(p);
+     }
+ 
+     // populating JSON Schema 'definitions'
+@@ -518,8 +567,8 @@ export function modelToJsonSchema<T extends object>(
+     const propSchema = getJsonSchema(referenceType, propOptions);
+ 
+     // JSONSchema6Definition allows both boolean and JSONSchema6 types
+-    if (typeof result.properties[p] !== 'boolean') {
+-      const prop = result.properties[p] as JsonSchema;
++    if (typeof ownPropsSchema.properties[p] !== 'boolean') {
++      const prop = ownPropsSchema.properties[p] as JsonSchema;
+       const propTitle = propSchema.title ?? referenceType.name;
+       const targetRef = {$ref: `#/definitions/${propTitle}`};
+ 
+@@ -527,42 +576,34 @@ export function modelToJsonSchema<T extends object>(
+         // Update $ref for array type
+         prop.items = targetRef;
+       } else {
+-        result.properties[p] = targetRef;
++        ownPropsSchema.properties[p] = targetRef;
+       }
+       includeReferencedSchema(propTitle, propSchema);
+     }
+   }
+ 
+-  result.additionalProperties = meta.settings.strict === false;
+-  debug('  additionalProperties?', result.additionalProperties);
+-
+-  if (options.includeRelations) {
+-    for (const r in meta.relations) {
+-      result.properties = result.properties ?? {};
+-      const relMeta = meta.relations[r];
+-      const targetType = resolveType(relMeta.target);
+-
+-      // `title` is the unique identity of a schema,
+-      // it should be removed from the `options`
+-      // when generating the relation or property schemas
+-      const targetOptions = {...options};
+-      delete targetOptions.title;
+-
+-      const targetSchema = getJsonSchema(targetType, targetOptions);
+-      const targetRef = {$ref: `#/definitions/${targetSchema.title}`};
+-      const propDef = getNavigationalPropertyForRelation(relMeta, targetRef);
+-
+-      result.properties[relMeta.name] =
+-        result.properties[relMeta.name] || propDef;
+-      includeReferencedSchema(targetSchema.title!, targetSchema);
+-    }
++  ownPropsSchema.additionalProperties = meta.settings.strict === false;
++  debug('  additionalProperties?', ownPropsSchema.additionalProperties);
++
++  const hasProperties = !!ownPropsSchema.properties;
++  if (parentModel) {
++    const parentOptions = {...options};
++    delete parentOptions.title;
++    const parentSchema = modelToJsonSchema(parentModel, parentOptions);
++    result.allOf = [
++      {$ref: `#/definitions/${parentSchema.title}`},
++      hasProperties && ownPropsSchema,
++    ].filter(Boolean);
++    includeReferencedSchema(parentSchema.title!, parentSchema);
++  } else {
++    Object.assign(result, ownPropsSchema);
+   }
+ 
+   function includeReferencedSchema(name: string, schema: JsonSchema) {
+     if (!schema || !Object.keys(schema).length) return;
+ 
+     // promote nested definition to the top level
+-    if (result !== schema && schema.definitions) {
++    if (result !== schema?.definitions) {
+       for (const key in schema.definitions) {
+         if (key === title) continue;
+         result.definitions = result.definitions ?? {};
+@@ -582,3 +623,25 @@ export function modelToJsonSchema<T extends object>(
+   }
+   return result;
+ }
++
++function getParentModel(ctor: Function) {
++  const proto = Object.getPrototypeOf(ctor) as Function;
++  const isBaseType = proto.name === 'Model' || proto.name === 'Entity';
++  const isModel = proto instanceof Model.constructor;
++  return !isBaseType && isModel ? proto : null;
++}
++
++function isInherited(
++  parentModel: ModelDefinition | null,
++  model: ModelDefinition,
++  propertyName: string,
++) {
++  if (!parentModel) {
++    return false;
++  }
++  // TODO(InvictusMB): deep equality check here?
++  return (
++    model.properties[propertyName]?.type ===
++    parentModel.properties[propertyName]?.type
++  );
++}
