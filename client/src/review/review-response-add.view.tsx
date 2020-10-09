@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {hooks} from '@ram-stack/core';
 import sanitize from 'sanitize-html';
 
 import {RestaurantWithRelations, ReviewWithRelations} from '../openapi/models';
@@ -6,7 +6,7 @@ import {extractMessages} from '../utils';
 
 export function ReviewResponseAddView(props: ReviewResponseAddViewProps) {
   const {Shell, restaurant, review, userProfileStore, restaurantStore} = props;
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = hooks.useState('');
 
   const {userProfile} = userProfileStore;
   if (!userProfile || (review.reviewResponses?.length || 0) > 0 || restaurant.ownerId !== userProfile.id) {
@@ -53,15 +53,13 @@ export function ReviewResponseAddView(props: ReviewResponseAddViewProps) {
   );
 }
 
-const dependencies = [
+ReviewResponseAddView.dependencies = [
   Injected.Shell,
   Injected.userProfileStore,
   Injected.restaurantStore,
-] as const;
-Object.assign(ReviewResponseAddView, {[Symbol.for('ram.deps')]: dependencies});
-
-type ReviewResponseAddViewProps = PickInjected<typeof dependencies> & {
+];
+type ReviewResponseAddViewProps = {
   restaurant: RestaurantWithRelations,
   review: ReviewWithRelations
-};
+} & PickInjected<typeof ReviewResponseAddView.dependencies>;
 

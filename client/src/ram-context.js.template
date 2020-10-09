@@ -1,7 +1,8 @@
 const Injected = {
-<%= injected.map(v => '  ' + v ).join(',\n') %><%= injected.length ? ',' : '  // to be generated...' %>
+  <%= injectedId.map(v => '  ' + v ).join(',\n') %><%= injectedId.length ? ',' : '  // to be generated...' %>
   Shell: 'Shell',
-  router: 'router',
+  ContainerContext: 'ContainerContext',
+  routerRoot: 'routerRoot',
 };
 
 window.Injected = Injected;

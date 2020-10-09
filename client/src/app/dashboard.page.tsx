@@ -1,9 +1,12 @@
-import React, {useEffect} from 'react';
-import {Link, Redirect} from '../core';
+import {
+  router,
+  hooks,
+} from '@ram-stack/core';
+
 import {UserRolesEnum} from '../openapi/models';
 import {isAllowed} from '../utils';
 
-export function DashboardPage(props: PickInjected<typeof dependencies>) {
+export function DashboardPage(props: DashboardPageProps) {
   const {Shell, userProfileStore, restaurantStore} = props;
 
   const dashboardRoles = [
@@ -11,7 +14,7 @@ export function DashboardPage(props: PickInjected<typeof dependencies>) {
   ];
 
   const isUserAllowed = isAllowed(dashboardRoles, userProfileStore.userProfile!);
-  useEffect(() => {
+  hooks.useEffect(() => {
     if (!userProfileStore.isFetching && isUserAllowed) {
       restaurantStore.loadByOwner(userProfileStore.userProfile).catch();
       restaurantStore.loadPendingReviews(userProfileStore.userProfile).catch();
@@ -29,7 +32,7 @@ export function DashboardPage(props: PickInjected<typeof dependencies>) {
 
   if (!isAllowed(dashboardRoles, userProfileStore.userProfile!)) {
     return (
-      <Redirect to="/" />
+      <router.Redirect to="/" />
     );
   }
 
@@ -39,9 +42,9 @@ export function DashboardPage(props: PickInjected<typeof dependencies>) {
         <div className="text-white whitespace-no-wrap">
           My Restaurants
         </div>
-        <Link to="/restaurants">
+        <router.Link to="/restaurants">
           <div className="bg-white text-blue-400 underline rounded-full ml-4 px-4 whitespace-no-wrap">See All</div>
-        </Link>
+        </router.Link>
       </div>
       <Shell.RestaurantListView />
       <div className="flex text-white font-bold p-2 bg-teal-600 mt-4 justify-between">
@@ -59,12 +62,10 @@ export function DashboardPage(props: PickInjected<typeof dependencies>) {
   );
 }
 
-const dependencies = [
+DashboardPage.route = '/dashboard';
+DashboardPage.dependencies = [
   Injected.Shell,
   Injected.userProfileStore,
   Injected.restaurantStore,
-] as const;
-Object.assign(DashboardPage, {
-  route: '/dashboard',
-  [Symbol.for('ram.deps')]: dependencies,
-});
+];
+type DashboardPageProps = PickInjected<typeof DashboardPage.dependencies>;

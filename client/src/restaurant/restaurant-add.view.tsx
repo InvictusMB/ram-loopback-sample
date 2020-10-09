@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {hooks} from '@ram-stack/core';
 import _ from 'lodash';
 
 import {UserRolesEnum} from '../openapi';
@@ -6,7 +6,7 @@ import {isAllowed} from '../utils';
 
 export function RestaurantAddView(props: RestaurantAddViewProps) {
   const {Shell, userProfileStore, restaurantStore} = props;
-  const [name, setName] = useState('');
+  const [name, setName] = hooks.useState('');
 
   if (!userProfileStore.userProfile) {
     return null;
@@ -70,17 +70,12 @@ export function RestaurantAddView(props: RestaurantAddViewProps) {
   );
 }
 
-const dependencies = [
+RestaurantAddView.dependencies = [
   Injected.Shell,
   Injected.userProfileStore,
   Injected.restaurantStore,
-] as const;
-Object.assign(RestaurantAddView, {[Symbol.for('ram.deps')]: dependencies});
-
-type RestaurantAddViewProps = PickInjected<typeof dependencies>;
-
-type Restaurant = RestaurantStore['restaurants'][number];
-type RestaurantStore = PickInjected<[typeof Injected.restaurantStore]>[typeof Injected.restaurantStore];
+];
+type RestaurantAddViewProps = PickInjected<typeof RestaurantAddView.dependencies>;
 
 function extractMessages(e: any): string[] {
   if (!e) {

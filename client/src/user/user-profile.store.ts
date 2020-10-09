@@ -1,4 +1,12 @@
-import {qs, task, computed, observable, reaction, IReactionDisposer} from '../core';
+import {
+  computed,
+  IReactionDisposer,
+  observable,
+  reaction,
+  task,
+} from '@ram-stack/core';
+
+import {qs} from '../utils';
 import {
   Configuration,
   UserControllerApi,
@@ -7,9 +15,14 @@ import {
 
 
 export class UserProfileStore {
+  static dependencies = [
+    Injected.apiService,
+    Injected.sessionStore,
+  ];
+
   @observable userProfile: UserProfile | null = null;
 
-  sessionStore: UserProfileStoreDeps[typeof Injected.sessionStore];
+  sessionStore: Injected.classes.SessionStore;
   loginReaction: IReactionDisposer;
   userApi?: UserControllerApi;
 
@@ -50,8 +63,4 @@ export class UserProfileStore {
   }
 }
 
-const dependencies = [
-  Injected.apiService,
-  Injected.sessionStore,
-] as const;
-type UserProfileStoreDeps = PickInjected<typeof dependencies>;
+type UserProfileStoreDeps = PickInjected<typeof UserProfileStore.dependencies>;

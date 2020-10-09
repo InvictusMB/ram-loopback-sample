@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import {hooks} from '@ram-stack/core';
 import {format} from 'date-fns';
 import sanitize from 'sanitize-html';
 
@@ -9,11 +9,11 @@ export function ReviewDetailsView(props: ReviewDetailsViewProps) {
   const {Shell, review, restaurant, restaurantStore, userProfileStore} = props;
   const response = (review.reviewResponses ?? [])[0];
 
-  const [editReview, setEditReview] = useState(false);
-  const [reviewComment, setReviewComment] = useState(review.comment);
+  const [editReview, setEditReview] = hooks.useState(false);
+  const [reviewComment, setReviewComment] = hooks.useState(review.comment);
 
-  const [editResponse, setEditResponse] = useState(false);
-  const [reviewResponse, setReviewResponse] = useState(response?.comment);
+  const [editResponse, setEditResponse] = hooks.useState(false);
+  const [reviewResponse, setReviewResponse] = hooks.useState(response?.comment);
 
   const allowedRoles = [
     UserRolesEnum.Admin,
@@ -161,14 +161,12 @@ export function ReviewDetailsView(props: ReviewDetailsViewProps) {
 }
 
 
-const dependencies = [
+ReviewDetailsView.dependencies = [
   Injected.Shell,
   Injected.restaurantStore,
   Injected.userProfileStore,
-] as const;
-Object.assign(ReviewDetailsView, {[Symbol.for('ram.deps')]: dependencies});
-
-type ReviewDetailsViewProps = PickInjected<typeof dependencies> & {
+];
+type ReviewDetailsViewProps = {
   review: ReviewWithRelations,
   restaurant: RestaurantWithRelations
-};
+} & PickInjected<typeof ReviewDetailsView.dependencies>;

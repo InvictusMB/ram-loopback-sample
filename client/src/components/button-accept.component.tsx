@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {ReactComponent as RefreshSvg} from './check.svg';
 
 export function ButtonAccept(props: React.ButtonHTMLAttributes<{}>) {
@@ -18,8 +16,6 @@ export function ButtonAccept(props: React.ButtonHTMLAttributes<{}>) {
     </button>
   );
 }
-
-Object.assign(ButtonAccept, {[Symbol.for('ram.deps')]: []});
 
 function AcceptIcon() {
   return (

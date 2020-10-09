@@ -1,14 +1,13 @@
-import React, {useState} from 'react';
+import {hooks} from '@ram-stack/core';
 
-import {useHistory} from '../core';
 import {User, UserRolesEnum} from '../openapi';
 import {isAllowed} from '../utils';
 
 export function UserSummaryView(props: UserSummaryViewProps) {
   const {Shell, user, userStore, userProfileStore} = props;
-  const history = useHistory();
-  const [edit, setEdit] = useState(false);
-  const [name, setName] = useState(user.name);
+  const history = hooks.useHistory();
+  const [edit, setEdit] = hooks.useState(false);
+  const [name, setName] = hooks.useState(user.name);
 
   const allowedRoles = [
     UserRolesEnum.Admin,
@@ -63,13 +62,11 @@ export function UserSummaryView(props: UserSummaryViewProps) {
   );
 }
 
-const dependencies = [
+UserSummaryView.dependencies = [
   Injected.Shell,
   Injected.userStore,
   Injected.userProfileStore,
-] as const;
-Object.assign(UserSummaryView, {[Symbol.for('ram.deps')]: dependencies});
-
-type UserSummaryViewProps = PickInjected<typeof dependencies> & {
+];
+type UserSummaryViewProps = {
   user: User
-};
+} & PickInjected<typeof UserSummaryView.dependencies>;

@@ -1,6 +1,12 @@
+import {
+  computed,
+  IReactionDisposer,
+  observable,
+  reaction,
+  task,
+} from '@ram-stack/core';
 import fp from 'lodash/fp';
 
-import {computed, IReactionDisposer, observable, reaction, task} from '../core';
 import {
   NewRestaurant,
   RestaurantWithRelations,
@@ -10,11 +16,17 @@ import {
 } from '../openapi';
 
 export class RestaurantStore {
+  static dependencies = [
+    Injected.apiService,
+    Injected.restaurantService,
+    Injected.sessionStore,
+  ];
+
   @observable restaurants: Restaurant[] = [];
   @observable restaurantDetails?: Restaurant;
   @observable pendingReviews: ReviewWithRelations[] = [];
 
-  restaurantService: RestaurantService;
+  restaurantService: Injected.classes.RestaurantService;
   loginReaction: IReactionDisposer;
 
   create = task.resolved(async (owner: UserWithRelations, restaurant: NewRestaurant) => {
@@ -117,12 +129,7 @@ export class RestaurantStore {
   }
 }
 
-const dependencies = [
-  Injected.apiService,
-  Injected.restaurantService,
-  Injected.sessionStore,
-] as const;
-type RestaurantStoreDeps = PickInjected<typeof dependencies>;
+type RestaurantStoreDeps = PickInjected<typeof RestaurantStore.dependencies>;
 
-type RestaurantService = RestaurantStoreDeps[typeof Injected.restaurantService];
+type RestaurantService = Injected.classes.RestaurantService;
 type Restaurant = UnwrapAsync<RestaurantService['getRestaurants']>[number];

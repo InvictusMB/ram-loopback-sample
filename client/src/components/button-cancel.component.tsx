@@ -1,5 +1,4 @@
-import React from 'react';
-
+import type {React} from '@ram-stack/core';
 import {ReactComponent as CancelSvg} from '../components/ccw.svg';
 
 export function ButtonCancel(props: React.ButtonHTMLAttributes<{}>) {
@@ -18,8 +17,6 @@ export function ButtonCancel(props: React.ButtonHTMLAttributes<{}>) {
     </button>
   );
 }
-
-Object.assign(ButtonCancel, {[Symbol.for('ram.deps')]: []});
 
 function CancelIcon() {
   return (

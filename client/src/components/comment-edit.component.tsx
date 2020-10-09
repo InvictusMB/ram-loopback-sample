@@ -1,4 +1,7 @@
-import React, {useRef} from 'react';
+import {
+  hooks,
+  view,
+} from '@ram-stack/core';
 
 export function CommentEdit(props: CommentEditProps) {
   const {
@@ -23,8 +26,6 @@ export function CommentEdit(props: CommentEditProps) {
   );
 }
 
-Object.assign(CommentEdit, {[Symbol.for('ram.deps')]: []});
-
 type CommentEditProps = {
   value: string;
   placeholder?: string;
@@ -38,7 +39,7 @@ function Editable(props: EditableProps) {
     onChange = (v: string) => {
     },
   } = props;
-  const contentDiv = useRef(null);
+  const contentDiv = hooks.useRef(null);
 
   function handleChange() {
     onChange((contentDiv.current as any).innerHTML);
@@ -64,6 +65,6 @@ type EditableProps = {
   className?: string;
 };
 
-const MemoEditable = React.memo(Editable, (old, {value}) => {
+const MemoEditable = view.memo(Editable, (old, {value}) => {
   return !!value;
 });

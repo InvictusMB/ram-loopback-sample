@@ -1,4 +1,10 @@
-import {computed, observable, qs, task} from '../core';
+import {
+  computed,
+  observable,
+  task,
+} from '@ram-stack/core';
+
+import {qs} from '../utils';
 import {Configuration, LoginCredentials} from '../openapi';
 import {UserControllerApi} from '../openapi/apis';
 import {PersistedValue} from './persisted-value';
@@ -6,9 +12,11 @@ import {PersistedValue} from './persisted-value';
 const AUTH_LOCAL_STORAGE_KEY = 'sessionData';
 
 export class SessionStore {
+  static dependencies = [Injected.apiService];
+
   @observable session: Session;
 
-  apiService: SessionStoreDeps[typeof Injected.apiService];
+  apiService: Injected.classes.ApiService;
   userApi: UserControllerApi;
 
   login = task.resolved(async (credentials: LoginCredentials) => {
@@ -44,7 +52,7 @@ export class SessionStore {
   });
   private storedSession: PersistedValue<Session>;
 
-  constructor(deps: PickInjected<typeof dependencies>) {
+  constructor(deps: SessionStoreDeps) {
     this.apiService = deps.apiService;
     this.storedSession = createStoredValue();
     this.session = this.storedSession.get();
@@ -72,8 +80,7 @@ export class SessionStore {
   }
 }
 
-const dependencies = [Injected.apiService] as const;
-type SessionStoreDeps = PickInjected<typeof dependencies>;
+type SessionStoreDeps = PickInjected<typeof SessionStore.dependencies>;
 
 type Session = LoggedInSession | NoSession;
 

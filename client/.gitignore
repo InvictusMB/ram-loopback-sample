@@ -3,6 +3,7 @@
 # generated
 /src/ram-context.d.ts
 /src/ram-context.js
+/src/composition-root.d.ts
 /src/styles/tailwind.css
 /src/openapi/
 

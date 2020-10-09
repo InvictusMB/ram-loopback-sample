@@ -1,9 +1,9 @@
-import React from 'react';
-import {Redirect} from '../core';
+import {router} from '@ram-stack/core';
+
 import {UserRolesEnum} from '../openapi/models';
 import {isAllowed} from '../utils';
 
-export function HomePage(props: PickInjected<typeof dependencies>) {
+export function HomePage(props: HomePageProps) {
   const {Shell, userProfileStore} = props;
 
   if (userProfileStore.isFetching) {
@@ -16,21 +16,19 @@ export function HomePage(props: PickInjected<typeof dependencies>) {
   ];
   if (isAllowed(dashboardRoles, userProfileStore.userProfile!)) {
     return (
-      <Redirect to="/dashboard" />
+      <router.Redirect to="/dashboard" />
     );
   }
 
   return (
-    <Redirect to="/restaurants" />
+    <router.Redirect to="/restaurants" />
   );
 }
 
-const dependencies = [
+HomePage.route = '/';
+HomePage.dependencies = [
   Injected.Shell,
   Injected.userProfileStore,
-] as const;
-Object.assign(HomePage, {
-  route: '/',
-  [Symbol.for('ram.deps')]: dependencies,
-});
+];
+type HomePageProps = PickInjected<typeof HomePage.dependencies>;
 

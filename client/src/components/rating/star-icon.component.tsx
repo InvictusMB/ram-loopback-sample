@@ -1,4 +1,3 @@
-import React from 'react';
 import {ReactComponent as StarSvg} from './star.svg';
 
 export function StarIcon({className = ''}) {
@@ -8,5 +7,3 @@ export function StarIcon({className = ''}) {
     </div>
   );
 }
-
-Object.assign(StarIcon, {[Symbol.for('ram.deps')]: []});

@@ -1,13 +1,14 @@
 import fp from 'lodash/fp';
-import React, {useEffect} from 'react';
+import {
+  router,
+  hooks,
+} from '@ram-stack/core';
 
-import {Link, useParams} from '../core';
-
-export function RestaurantDetailsPage(props: PickInjected<typeof dependencies>) {
+export function RestaurantDetailsPage(props: RestaurantDetailsPageProps) {
   const {Shell, restaurantStore} = props;
-  const {id} = useParams<{id: string}>();
+  const {id} = hooks.useParams<{id: string}>();
 
-  useEffect(() => {
+  hooks.useEffect(() => {
     if (restaurantStore.restaurantDetails?.id !== id) {
       restaurantStore.loadDetails(id).catch();
     }
@@ -28,11 +29,11 @@ export function RestaurantDetailsPage(props: PickInjected<typeof dependencies>) 
         <div className="text-white whitespace-no-wrap">
           Restaurant details
         </div>
-        <Link to="/restaurants">
+        <router.Link to="/restaurants">
           <div className="bg-white text-blue-400 underline rounded-full ml-4 px-4 whitespace-no-wrap">
             To List
           </div>
-        </Link>
+        </router.Link>
       </div>
       <Shell.RestaurantSummaryView {...{
         restaurant,
@@ -83,11 +84,9 @@ export function RestaurantDetailsPage(props: PickInjected<typeof dependencies>) 
   );
 }
 
-const dependencies = [
+RestaurantDetailsPage.route = '/restaurants/:id';
+RestaurantDetailsPage.dependencies = [
   Injected.Shell,
   Injected.restaurantStore,
-] as const;
-Object.assign(RestaurantDetailsPage, {
-  route: '/restaurants/:id',
-  [Symbol.for('ram.deps')]: dependencies,
-});
+];
+type RestaurantDetailsPageProps = PickInjected<typeof RestaurantDetailsPage.dependencies>;

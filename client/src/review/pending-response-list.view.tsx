@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function PendingResponseListView({Shell, restaurantStore}: ReviewListViewProps) {
   if (restaurantStore.loadPendingReviews.pending) {
     return (
@@ -29,10 +27,8 @@ export function PendingResponseListView({Shell, restaurantStore}: ReviewListView
   );
 }
 
-const dependencies = [
+PendingResponseListView.dependencies = [
   Injected.Shell,
   Injected.restaurantStore,
-] as const;
-Object.assign(PendingResponseListView, {[Symbol.for('ram.deps')]: dependencies});
-
-type ReviewListViewProps = PickInjected<typeof dependencies>;
+];
+type ReviewListViewProps = PickInjected<typeof PendingResponseListView.dependencies>;

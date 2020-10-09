@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function InlineEdit(props: ButtonAcceptProps) {
   const {
     Shell,
@@ -46,12 +44,10 @@ export function InlineEdit(props: ButtonAcceptProps) {
     ;
 }
 
-const dependencies = [
+InlineEdit.dependencies = [
   Injected.Shell,
 ];
-Object.assign(InlineEdit, {[Symbol.for('ram.deps')]: dependencies});
-
-type ButtonAcceptProps = PickInjected<typeof dependencies> & {
+type ButtonAcceptProps = PickInjected<typeof InlineEdit.dependencies> & {
   className?: string,
   value: string,
   placeholder?: string,

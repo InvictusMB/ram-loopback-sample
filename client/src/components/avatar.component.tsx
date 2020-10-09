@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function Avatar({id = '0'}: {id?: string}) {
   const gender = +id % 2 === 0 ? 'women' : 'men';
   return (
@@ -9,5 +7,3 @@ export function Avatar({id = '0'}: {id?: string}) {
     />
   );
 }
-
-Object.assign(Avatar, {[Symbol.for('ram.deps')]: []});

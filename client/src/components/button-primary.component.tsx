@@ -1,4 +1,4 @@
-import React from 'react';
+import type {React} from '@ram-stack/core';
 
 export function ButtonPrimary(props: React.ButtonHTMLAttributes<{}>) {
   const {className, ...rest} = props;
@@ -16,6 +16,3 @@ export function ButtonPrimary(props: React.ButtonHTMLAttributes<{}>) {
     }} />
   );
 }
-
-Object.assign(ButtonPrimary, {[Symbol.for('ram.deps')]: []});
-

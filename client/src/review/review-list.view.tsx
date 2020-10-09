@@ -1,5 +1,4 @@
 import fp from 'lodash/fp';
-import React from 'react';
 import {RestaurantWithRelations} from '../openapi/models';
 
 export function ReviewListView({Shell, restaurantStore, restaurant}: ReviewListViewProps) {
@@ -27,12 +26,10 @@ export function ReviewListView({Shell, restaurantStore, restaurant}: ReviewListV
   );
 }
 
-const dependencies = [
+ReviewListView.dependencies = [
   Injected.Shell,
   Injected.restaurantStore,
-] as const;
-Object.assign(ReviewListView, {[Symbol.for('ram.deps')]: dependencies});
-
-type ReviewListViewProps = PickInjected<typeof dependencies> & {
+];
+type ReviewListViewProps = {
   restaurant: RestaurantWithRelations
-};
+} & PickInjected<typeof ReviewListView.dependencies>;

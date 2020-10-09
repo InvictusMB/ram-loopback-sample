@@ -1,9 +1,12 @@
-import React, {useEffect} from 'react';
-import {Link, Redirect} from '../core';
+import {
+  router,
+  hooks,
+} from '@ram-stack/core';
+
 import {UserRolesEnum} from '../openapi/models';
 import {isAllowed} from '../utils';
 
-export function UserListPage(props: PickInjected<typeof dependencies>) {
+export function UserListPage(props: UserListPageProps) {
   const {Shell, userStore, userProfileStore} = props;
 
   const allowedRoles = [
@@ -11,7 +14,7 @@ export function UserListPage(props: PickInjected<typeof dependencies>) {
   ];
   const isUserAllowed = isAllowed(allowedRoles, userProfileStore.userProfile);
 
-  useEffect(() => {
+  hooks.useEffect(() => {
     if (isUserAllowed && !userStore.users && !userStore.isFetching) {
       userStore.load().catch();
     }
@@ -25,7 +28,7 @@ export function UserListPage(props: PickInjected<typeof dependencies>) {
 
   if (!isUserAllowed) {
     return (
-      <Redirect to="/" />
+      <router.Redirect to="/" />
     );
   }
 
@@ -35,11 +38,11 @@ export function UserListPage(props: PickInjected<typeof dependencies>) {
         <div className="text-white whitespace-no-wrap">
           Users
         </div>
-        <Link to="/restaurants">
+        <router.Link to="/restaurants">
           <div className="bg-white text-blue-400 underline rounded-full ml-4 px-4 whitespace-no-wrap">
             To Restaurants
           </div>
-        </Link>
+        </router.Link>
       </div>
       {userStore.users?.map(user => (
         <Shell.UserSummaryView {...{
@@ -51,12 +54,10 @@ export function UserListPage(props: PickInjected<typeof dependencies>) {
   );
 }
 
-const dependencies = [
+UserListPage.route = '/users';
+UserListPage.dependencies = [
   Injected.Shell,
   Injected.userStore,
   Injected.userProfileStore,
-] as const;
-Object.assign(UserListPage, {
-  route: '/users',
-  [Symbol.for('ram.deps')]: dependencies,
-});
+];
+type UserListPageProps = PickInjected<typeof UserListPage.dependencies>;

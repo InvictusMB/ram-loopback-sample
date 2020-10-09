@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
-import {useHistory} from '../core';
+import {hooks} from '@ram-stack/core';
+
 import {extractMessages} from '../utils';
 
-export function LoginFormView({Shell, sessionStore}: PickInjected<typeof dependencies>) {
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
-  const history = useHistory();
+export function LoginFormView({Shell, sessionStore}: LoginFormViewProps) {
+  const [login, setLogin] = hooks.useState('');
+  const [password, setPassword] = hooks.useState('');
+  const history = hooks.useHistory();
 
   if (sessionStore.isFetching) {
     return (
@@ -62,6 +62,8 @@ export function LoginFormView({Shell, sessionStore}: PickInjected<typeof depende
   );
 }
 
-const dependencies = [Injected.Shell, Injected.sessionStore] as const;
-
-Object.assign(LoginFormView, {[Symbol.for('ram.deps')]: dependencies});
+LoginFormView.dependencies = [
+  Injected.Shell,
+  Injected.sessionStore,
+];
+type LoginFormViewProps = PickInjected<typeof LoginFormView.dependencies>;

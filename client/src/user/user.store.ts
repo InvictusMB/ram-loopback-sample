@@ -1,16 +1,28 @@
+import {
+  computed,
+  IReactionDisposer,
+  observable,
+  reaction,
+  task,
+} from '@ram-stack/core';
 import fp from 'lodash/fp';
 
-import {task, computed, observable, reaction, IReactionDisposer} from '../core';
 import {
   User,
 } from '../openapi';
 
 
 export class UserStore {
+  static dependencies = [
+    Injected.apiService,
+    Injected.sessionStore,
+    Injected.userService,
+  ];
+
   @observable users: User[] | null = null;
 
-  sessionStore: UserStoreDeps[typeof Injected.sessionStore];
-  userService: UserStoreDeps[typeof Injected.userService];
+  sessionStore: Injected.classes.SessionStore;
+  userService: Injected.classes.UserService;
   loginReaction: IReactionDisposer;
 
   load = task.resolved(async () => {
@@ -53,9 +65,4 @@ export class UserStore {
   }
 }
 
-const dependencies = [
-  Injected.apiService,
-  Injected.sessionStore,
-  Injected.userService,
-] as const;
-type UserStoreDeps = PickInjected<typeof dependencies>;
+type UserStoreDeps = PickInjected<typeof UserStore.dependencies>;

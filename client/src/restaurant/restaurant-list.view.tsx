@@ -1,7 +1,6 @@
 import fp from 'lodash/fp';
-import React from 'react';
+import {router} from '@ram-stack/core';
 
-import {Link} from '../core';
 import {RestaurantWithRelations} from '../openapi/models';
 
 export function RestaurantListView({Shell, restaurantStore, filter}: RestaurantListViewProps) {
@@ -24,26 +23,24 @@ export function RestaurantListView({Shell, restaurantStore, filter}: RestaurantL
   return (
     <div>
       {restaurantsWithRating.map(restaurant => (
-        <Link key={restaurant.id} to={`/restaurants/${restaurant.id}`}>
+        <router.Link key={restaurant.id} to={`/restaurants/${restaurant.id}`}>
           <Shell.RestaurantSummaryView {...{
             restaurant,
           }} />
-        </Link>
+        </router.Link>
       ))}
       <Shell.RestaurantAddView />
     </div>
   );
 }
 
-const dependencies = [
+RestaurantListView.dependencies = [
   Injected.Shell,
   Injected.restaurantStore,
-] as const;
-Object.assign(RestaurantListView, {[Symbol.for('ram.deps')]: dependencies});
-
-type RestaurantListViewProps = PickInjected<typeof dependencies> & {
+];
+type RestaurantListViewProps = {
   filter?: (r: RestaurantWithRelations) => boolean
-};
+} & PickInjected<typeof RestaurantListView.dependencies>;
 
 function avgReview(r: RestaurantWithRelations) {
   const ratings = (r.reviews ?? []).map(rv => rv.rating);

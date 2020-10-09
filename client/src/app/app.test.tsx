@@ -1,5 +1,4 @@
 import {render} from '@testing-library/react';
-import React from 'react';
 
 import '../ram-context';
 
@@ -12,11 +11,11 @@ test('renders routes', () => {
         foo: () => <div>foo</div>,
         LoginStatusView: () => null,
       } as any,
-      router: {
+      routerRoot: {
         routeConfig: {
           '/': 'foo',
         },
-      },
+      } as any,
     }} />,
   );
   const linkElement = getByText('foo');

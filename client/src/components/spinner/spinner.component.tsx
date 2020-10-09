@@ -1,4 +1,3 @@
-import React from 'react';
 import {ReactComponent as SpinnerIcon} from './spinner.svg';
 
 export function Spinner() {
@@ -10,6 +9,4 @@ export function Spinner() {
     </div>
   );
 }
-
-Object.assign(Spinner, {[Symbol.for('ram.deps')]: []});
 

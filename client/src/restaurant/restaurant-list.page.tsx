@@ -1,11 +1,13 @@
-import React, {useState} from 'react';
+import {
+  router,
+  hooks,
+} from '@ram-stack/core';
 
-import {Link} from '../core';
 import {UserRolesEnum} from '../openapi/models';
 import {isAllowed} from '../utils';
 
-export function RestaurantListPage({Shell, userProfileStore}: PickInjected<typeof dependencies>) {
-  const [rating, setRating] = useState(0);
+export function RestaurantListPage({Shell, userProfileStore}: RestaurantListPageProps) {
+  const [rating, setRating] = hooks.useState(0);
 
   const dashboardRoles = [
     UserRolesEnum.Business,
@@ -25,18 +27,18 @@ export function RestaurantListPage({Shell, userProfileStore}: PickInjected<typeo
         <div className="font-bold p-2 flex">
           <div>Restaurants</div>
           {isOwner && (
-            <Link to="/dashboard">
+            <router.Link to="/dashboard">
               <div className="bg-white text-blue-400 underline rounded-full ml-4 px-4 whitespace-no-wrap">
                 My Dashboard
               </div>
-            </Link>
+            </router.Link>
           )}
           {isAdmin && (
-            <Link to="/users">
+            <router.Link to="/users">
               <div className="bg-white text-blue-400 underline rounded-full ml-4 px-4 whitespace-no-wrap">
                 Users
               </div>
-            </Link>
+            </router.Link>
           )}
         </div>
         <div className="px-2 self-center flex">
@@ -57,11 +59,9 @@ export function RestaurantListPage({Shell, userProfileStore}: PickInjected<typeo
   );
 }
 
-const dependencies = [
+RestaurantListPage.route = '/restaurants';
+RestaurantListPage.dependencies = [
   Injected.Shell,
   Injected.userProfileStore,
-] as const;
-Object.assign(RestaurantListPage, {
-  route: '/restaurants',
-  [Symbol.for('ram.deps')]: dependencies,
-});
+];
+type RestaurantListPageProps = PickInjected<typeof RestaurantListPage.dependencies>;

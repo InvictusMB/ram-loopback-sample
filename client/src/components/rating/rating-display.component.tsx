@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import React from 'react';
 
 const MAX_RATING = 5;
 
@@ -18,11 +17,9 @@ export function RatingDisplay({Shell, rating}: RatingDisplayProps) {
   );
 }
 
-const dependencies = [
+RatingDisplay.dependencies = [
   Injected.Shell,
-] as const;
-Object.assign(RatingDisplay, {[Symbol.for('ram.deps')]: dependencies});
-
-type RatingDisplayProps = PickInjected<typeof dependencies> & {
+];
+type RatingDisplayProps = PickInjected<typeof RatingDisplay.dependencies> & {
   rating: number,
 };

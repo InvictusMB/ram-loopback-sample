@@ -1,4 +1,4 @@
-import React from 'react';
+import type {React} from '@ram-stack/core';
 
 import {ReactComponent as RefreshSvg} from './edit.svg';
 
@@ -18,8 +18,6 @@ export function ButtonEdit(props: React.ButtonHTMLAttributes<{}>) {
     </button>
   );
 }
-
-Object.assign(ButtonEdit, {[Symbol.for('ram.deps')]: []});
 
 function RefreshIcon() {
   return (

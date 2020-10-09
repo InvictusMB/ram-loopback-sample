@@ -1,32 +1,35 @@
 import {registerModule} from '@ram-stack/composition-root/macro';
-import React from 'react';
-import {render} from 'react-dom';
-import {asClass, asValue, createContainer, observer} from './core';
+import type {InjectedDependencies} from "@ram-stack/context";
+import {createCompositionRoot, createRouterRoot, di, view} from '@ram-stack/core';
+
 import * as serviceWorker from './serviceWorker';
-import {createRouter} from './router';
-
 import './styles/tailwind.css';
-import {createInjector} from './with-container';
+import './ram-context';
 
-const container = createContainer();
-const router = createRouter();
+const {asClass, asValue} = di;
+const root = createCompositionRoot<InjectedDependencies>({
+  onReady: renderApp,
+});
+const withInjected = root.withInjected;
 
-const withContainer = createInjector(container);
+const router = createRouterRoot();
+root.container.register({
+  routerRoot: asValue(router),
+});
 
 registerModule({
   asClass,
   asValue,
-  container,
+  root,
+  withInjected,
   router,
-  observer,
-  withContainer,
 }, '.');
 
-container.register({router: asValue(router)})
+function renderApp() {
+  const Shell = root.container.resolve('Shell');
 
-const AppView = container.resolve('AppView') as any;
-
-render(<AppView />, document.getElementById('root'));
+  view.renderDom(<Shell.AppView />, document.getElementById('root'));
+}
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

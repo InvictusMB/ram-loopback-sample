@@ -1,31 +1,31 @@
-import React from 'react';
-import {BrowserRouter as Router} from 'react-router-dom';
+import {router} from '@ram-stack/core';
 
-import {Route, Switch} from '../core';
-
-export const AppView = ({Shell, router}: PickInjected<typeof dependencies>) => {
+export function AppView({Shell, routerRoot}: AppViewProps) {
   return (
     <div>
-      <Router>
+      <router.BrowserRouter>
         <Shell.LoginStatusView />
-        <Switch>
-          {Object.entries(router.routeConfig)
+        <router.Switch>
+          {Object.entries(routerRoot.routeConfig)
             .map(([path, id]) => {
               return ([path, Shell[id as keyof Shell]]);
             })
             .map(([path, Component]) => (
-              <Route {...{
+              <router.Route {...{
                 key: path as string,
                 path: path as string,
                 exact: true,
                 render: (props: any) => <Component {...props} />,
               }} />
             ))}
-        </Switch>
-      </Router>
+        </router.Switch>
+      </router.BrowserRouter>
     </div>
   );
-};
+}
 
-const dependencies = [Injected.Shell, Injected.router] as const;
-Object.assign(AppView, {[Symbol.for('ram.deps')]: dependencies});
+AppView.dependencies = [
+  Injected.Shell,
+  Injected.routerRoot,
+];
+type AppViewProps = PickInjected<typeof AppView.dependencies>;

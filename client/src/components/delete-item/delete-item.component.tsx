@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import {hooks} from '@ram-stack/core';
+import type {React} from '@ram-stack/core';
 
 import {UserRolesEnum} from '../../openapi';
 import {isAllowed} from '../../utils';
@@ -13,7 +14,7 @@ enum DeleteState {
 
 export function DeleteItem(props: DeleteItemProps) {
   const {Shell, userProfileStore, error, executeDelete} = props;
-  const [state, setState] = useState(DeleteState.Initial);
+  const [state, setState] = hooks.useState(DeleteState.Initial);
 
   if (!userProfileStore.userProfile) {
     return null;
@@ -94,14 +95,12 @@ function DeleteIcon() {
   );
 }
 
-const dependencies = [
+DeleteItem.dependencies = [
   Injected.Shell,
   Injected.userProfileStore,
   Injected.restaurantStore,
-] as const;
-Object.assign(DeleteItem, {[Symbol.for('ram.deps')]: dependencies});
-
-type DeleteItemProps = PickInjected<typeof dependencies> & {
+];
+type DeleteItemProps = PickInjected<typeof DeleteItem.dependencies> & {
   error?: any,
   executeDelete: () => Promise<void>,
 };

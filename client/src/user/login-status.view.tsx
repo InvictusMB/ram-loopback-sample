@@ -1,6 +1,4 @@
-import React from 'react';
-
-export function LoginStatusView({Shell, userProfileStore, sessionStore}: PickInjected<typeof dependencies>) {
+export function LoginStatusView({Shell, userProfileStore, sessionStore}: LoginStatusViewProps) {
   if (userProfileStore.isFetching) {
     return (
       <Shell.Spinner />
@@ -32,10 +30,9 @@ export function LoginStatusView({Shell, userProfileStore, sessionStore}: PickInj
   );
 }
 
-const dependencies = [
+LoginStatusView.dependencies = [
   Injected.Shell,
   Injected.userProfileStore,
   Injected.sessionStore,
-] as const;
-
-Object.assign(LoginStatusView, {[Symbol.for('ram.deps')]: dependencies});
+];
+type LoginStatusViewProps = PickInjected<typeof LoginStatusView.dependencies>;

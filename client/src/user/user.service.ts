@@ -1,14 +1,24 @@
-import {IReactionDisposer, qs, reaction} from '../core';
+import {
+  IReactionDisposer,
+  reaction,
+} from '@ram-stack/core';
+
 import {
   Configuration,
   NewUser,
   User,
   UserControllerApi,
 } from '../openapi';
+import {qs} from '../utils';
 
 export class UserService {
+  static dependencies = [
+    Injected.apiService,
+    Injected.sessionStore,
+  ];
+
   userApi: UserControllerApi;
-  apiService: UserServiceDeps[typeof Injected.apiService];
+  apiService: Injected.classes.ApiService;
   loginReaction: IReactionDisposer;
 
   constructor(deps: UserServiceDeps) {
@@ -79,8 +89,5 @@ export class UserService {
   }
 }
 
-const dependencies = [
-  Injected.apiService,
-  Injected.sessionStore,
-] as const;
-type UserServiceDeps = PickInjected<typeof dependencies>;
+
+type UserServiceDeps = PickInjected<typeof UserService.dependencies>;

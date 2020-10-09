@@ -1,6 +1,11 @@
+import {
+  IReactionDisposer,
+  reaction,
+} from '@ram-stack/core';
+
 import fp from 'lodash/fp';
 
-import {IReactionDisposer, qs, reaction} from '../core';
+import {qs} from '../utils';
 import {
   Configuration,
   NewRestaurant,
@@ -18,11 +23,16 @@ import {
 } from '../openapi';
 
 export class RestaurantService {
+  static dependencies = [
+    Injected.apiService,
+    Injected.sessionStore,
+  ];
+
   restaurantApi: RestaurantControllerApi;
   restaurantReviewApi: RestaurantReviewControllerApi;
   reviewApi: ReviewControllerApi;
   reviewResponseApi: ReviewResponseControllerApi;
-  apiService: RestaurantServiceDeps[typeof Injected.apiService];
+  apiService: Injected.classes.ApiService;
   loginReaction: IReactionDisposer;
 
   constructor(deps: RestaurantServiceDeps) {
@@ -272,8 +282,4 @@ export class RestaurantService {
   }
 }
 
-const dependencies = [
-  Injected.apiService,
-  Injected.sessionStore,
-] as const;
-type RestaurantServiceDeps = PickInjected<typeof dependencies>;
+type RestaurantServiceDeps = PickInjected<typeof RestaurantService.dependencies>;

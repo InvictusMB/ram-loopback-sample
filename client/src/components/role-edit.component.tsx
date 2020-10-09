@@ -1,4 +1,3 @@
-import React from 'react';
 import {UserRolesEnum} from '../openapi/models';
 
 export function RoleEdit(props: RoleEditProps) {
@@ -31,8 +30,6 @@ export function RoleEdit(props: RoleEditProps) {
     </div>
   );
 }
-
-Object.assign(RoleEdit, {[Symbol.for('ram.deps')]: []});
 
 type RoleEditProps = {
   value?: string[],

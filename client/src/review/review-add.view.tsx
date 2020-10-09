@@ -1,5 +1,5 @@
+import {hooks} from '@ram-stack/core';
 import {format, subYears} from 'date-fns';
-import React, {useState} from 'react';
 import sanitize from 'sanitize-html';
 
 import {RestaurantWithRelations} from '../openapi/models';
@@ -7,9 +7,9 @@ import {extractMessages} from '../utils';
 
 export function ReviewAddView(props: ReviewAddViewProps) {
   const {Shell, restaurant, userProfileStore, restaurantStore} = props;
-  const [comment, setComment] = useState('');
-  const [rating, setRating] = useState(0);
-  const [date, setDate] = useState(toDisplay(new Date()));
+  const [comment, setComment] = hooks.useState('');
+  const [rating, setRating] = hooks.useState(0);
+  const [date, setDate] = hooks.useState(toDisplay(new Date()));
 
   const {userProfile} = userProfileStore;
   if (!userProfile || restaurant.ownerId === userProfile.id) {
@@ -90,14 +90,12 @@ function toDisplay(date: Date) {
   return format(date, 'yyyy-MM-dd');
 }
 
-const dependencies = [
+ReviewAddView.dependencies = [
   Injected.Shell,
   Injected.userProfileStore,
   Injected.restaurantStore,
-] as const;
-Object.assign(ReviewAddView, {[Symbol.for('ram.deps')]: dependencies});
-
-type ReviewAddViewProps = PickInjected<typeof dependencies> & {
+];
+type ReviewAddViewProps = {
   restaurant: RestaurantWithRelations
-};
+} & PickInjected<typeof ReviewAddView.dependencies>;
 

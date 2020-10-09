@@ -1,7 +1,6 @@
+import {hooks} from '@ram-stack/core';
 import _ from 'lodash';
-import React, {useState} from 'react';
 
-import {useHistory} from '../core';
 import {RestaurantWithRelations, UserRolesEnum} from '../openapi';
 import {isAllowed} from '../utils';
 
@@ -11,9 +10,9 @@ import {ReactComponent as BottomSvg} from './align-bottom.svg';
 
 export function RestaurantSummaryView(props: RestaurantSummaryViewProps) {
   const {Shell, restaurant, restaurantStore, userProfileStore} = props;
-  const history = useHistory();
-  const [edit, setEdit] = useState(false);
-  const [name, setName] = useState(restaurant.name);
+  const history = hooks.useHistory();
+  const [edit, setEdit] = hooks.useState(false);
+  const [name, setName] = hooks.useState(restaurant.name);
 
   const allowedRoles = [
     UserRolesEnum.Admin,
@@ -102,16 +101,14 @@ function MinIcon() {
   );
 }
 
-const dependencies = [
+RestaurantSummaryView.dependencies = [
   Injected.Shell,
   Injected.restaurantStore,
   Injected.userProfileStore,
-] as const;
-Object.assign(RestaurantSummaryView, {[Symbol.for('ram.deps')]: dependencies});
-
-type RestaurantSummaryViewProps = PickInjected<typeof dependencies> & {
+];
+type RestaurantSummaryViewProps = {
   restaurant: RestaurantWithRelations
-};
+} & PickInjected<typeof RestaurantSummaryView.dependencies>;
 
 
 function maxReview(r: RestaurantWithRelations) {
